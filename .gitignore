@@ -19,6 +19,7 @@
 *.so
 *.so.*
 *.dylib
+*.swp
 
 # Executables
 *.exe
@@ -27,6 +28,14 @@
 *.i*86
 *.x86_64
 *.hex
+speak
+listen
 
 # Debug files
 *.dSYM/
+
+# Logs
+*.log
+*.txt
+
+

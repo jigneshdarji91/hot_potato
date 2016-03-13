@@ -27,6 +27,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include "debug.h"
 
 int main (int argc, char *argv[])
 {
@@ -70,6 +71,7 @@ int main (int argc, char *argv[])
     sin.sin_family = AF_INET;
     sin.sin_port = htons(port);
     memcpy(&sin.sin_addr, hp->h_addr_list[0], hp->h_length);
+    log_inf("port: %d sin_port: %d", port, sin.sin_port);
 
     /* bind socket s to address sin */
     rc = bind(s, (struct sockaddr *)&sin, sizeof(sin));

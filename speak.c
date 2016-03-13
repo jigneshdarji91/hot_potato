@@ -27,6 +27,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
+#include "debug.h"
 
 #define LEN	64
 
@@ -64,6 +65,7 @@ int main (int argc, char *argv[])
     sin.sin_family = AF_INET;
     sin.sin_port = htons(port);
     memcpy(&sin.sin_addr, hp->h_addr_list[0], hp->h_length);
+    log_inf("port: %d sin_port: %d", port, sin.sin_port);
 
     /* connect to socket at above addr and port */
     rc = connect(s, (struct sockaddr *)&sin, sizeof(sin));
@@ -94,3 +96,4 @@ int main (int argc, char *argv[])
 }
 
 /*........................ end of speak.c ...................................*/
+
