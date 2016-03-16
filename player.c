@@ -24,3 +24,88 @@
  * 4. On receiving potato, check TTL;
  *  a. If non-zero, send to right neighbor
  *  b. Else, append signature and send to Master and close program */
+
+
+void connectToMaster()
+{
+
+}
+
+void listenForLeftNeighbor()
+{
+
+}
+
+void leftNeighborConnected()
+{
+
+}
+
+void neighborInfoSentByMaster()
+{
+    connectToRightNeighbor();
+}
+
+void checkConnectionAndInformMaster()
+{
+    if(isConnectedToBothNeighbors())
+        informMasterConnectionComplete();
+}
+
+void informMasterConnectionComplete()
+{
+
+}
+
+void connectToRightNeighbor()
+{
+
+}
+
+bool isConnectedToBothNeighbors()
+{
+    if(selfInfo->isLeftConnected &&
+        selfInfo->isRightConnected)
+        return true;
+    return false;
+}
+
+void potatoReceivedEvent()
+{
+    appendSignatureToPotato();
+    sendPotatoToRandomNeighbor();
+}
+
+void appendSignatureToPotato()
+{
+
+}
+
+void sendPotatoToRandomNeighbor()
+{
+
+}
+
+void killSelfEvent()
+{
+    closeConnections();
+    //exit(0);
+}
+
+void closeConnections()
+{
+    closeLeftConnection();
+    closeRightConnection();
+}
+
+void closeLeftConnection()
+{
+
+}
+
+void closeRightConnection()
+{
+
+}
+
+
