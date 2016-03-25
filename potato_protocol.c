@@ -19,6 +19,9 @@
 #include "potato_protocol.h"
 #include <string.h>
 
+//FIXME: defined in master.c
+#define MAX_MSG_LEN 9616
+
 int createLeftSocketPortMessage(int port, char* message)
 {
     log_dbg("begin");
@@ -31,3 +34,27 @@ int createLeftSocketPortMessage(int port, char* message)
 
     log_dbg("end messsage: %s", message);
 }
+
+int parseMessage(char* message)
+{
+    log_inf("begin received message: %s", message);
+    char messageToParse[MAX_MSG_LEN];
+    char* messageType = "";
+    strcpy(messageToParse, message);
+
+    char *messageSplit = strtok(messageToParse, ";");
+    while(messageSplit != NULL)
+    {
+        if(NULL != strstr(messageSplit, "MESSAGE_TYPE"))
+        {
+            messageType = strtok(messageSplit, ":");
+            messageType = strtok(NULL, ":");
+            log_inf("section: %s message type: %s", messageSplit, messageType);
+            break;
+        }
+       messageSplit = strtok(NULL, ";");
+    } 
+
+    log_inf("end");
+}
+

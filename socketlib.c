@@ -17,6 +17,7 @@
  */
 
 #include "socketlib.h"
+#include "potato_protocol.h"
 
 #define MAXMSG  512
 
@@ -57,6 +58,7 @@ int readMessageOnSocket(int filedes)
 {
     char buffer[MAXMSG];
     int nbytes;
+    int retVal;
 
     nbytes = read (filedes, buffer, MAXMSG);
     if (nbytes < 0)
@@ -67,18 +69,19 @@ int readMessageOnSocket(int filedes)
     }
     else if (nbytes == 0)
         /*  End-of-file. */
-        return -1;
+        retVal = -1;
     else
     {
         /*  Data read. */
         fprintf (stderr, "Server: got message: `%s'\n", buffer);
-        log_inf("message: `%s'\n", buffer);
-        return 0;
+        parseMessage(buffer);
+        retVal = 0;
     }
 
     //TODO: this happens on shutdown
     /* close (i);
        FD_CLR (i, &active_fd_set); */
+       return retVal;
 }
 
 pthread_t makeSingleClientServer(int port)
