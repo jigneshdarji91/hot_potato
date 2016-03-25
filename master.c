@@ -59,11 +59,11 @@ int registerPlayerConnectedEventHandler()
     registerClientConnectedCallback(playerConnectedEvent);
 }
 
-int playerConnectedEvent(struct sockaddr_in playerSock)
+int playerConnectedEvent(struct sockaddr_in* playerSock)
 {
     log_dbg("begin");
     log_inf("Server: connect from host %s, port %hd\n",
-            inet_ntoa (playerSock.sin_addr),
-            ntohs (playerSock.sin_port));
+            inet_ntoa (playerSock->sin_addr),
+            ntohs (playerSock->sin_port));
     log_dbg("end");
 }
