@@ -26,9 +26,17 @@
  *  b. Else, append signature and send to Master and close program */
 
 #include "player.h"
+#include "potato_protocol.h"
+
+#define MAX_MSG_LEN 9616
 
 int masterPort;
-int leftPort = 0; //FIXME: random-port server start
+
+PlayerInfo selfInfo, masterInfo;
+int isLeftServerStarted = 0;
+int leftSocketFD; 
+int leftPort = 0; 
+struct sockaddr_in leftSocketAddr;
 
 //char* log_filename = "player.log";
 
@@ -40,6 +48,8 @@ int main (int argc, char *argv[])
         exit(1);
     }
 
+    registerEventHandlers();
+
     masterPort = atoi(argv[2]);
     log_inf("player: master=%s port=%d", argv[1], masterPort);
     pthread_t leftThreadId = makeSingleClientServer(leftPort);
@@ -47,4 +57,65 @@ int main (int argc, char *argv[])
 
     pthread_join(masterThreadId, NULL);
     pthread_join(leftThreadId, NULL);
+}
+
+int registerEventHandlers()
+{
+    registerMasterConnectedEventHandler();
+    registerServerStartedEventHandler();
+}
+int registerMasterConnectedEventHandler()
+{
+    registerServerConnectedCallback(masterConnectedEventHandler);
+}
+
+int registerServerStartedEventHandler()
+{
+    registerServerStartedCallback(serverStartedEventHandler);
+}
+
+int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
+{
+
+    //FIXME: the leftSock comes blank as we're using random port.
+    // Currently using getsockname as a workaround. 
+    log_dbg("begin sockfd: %d", sockfd);
+
+    struct sockaddr_in sin;
+    socklen_t len = sizeof(sin);
+    if (getsockname(sockfd, (struct sockaddr *)&sin, &len) == -1)
+            perror("getsockname");
+
+    log_inf("host %s, port %hd\n",
+            inet_ntoa (sin.sin_addr),
+            ntohs (sin.sin_port));
+
+    leftSocketFD = sockfd;
+    leftSocketAddr = sin;
+
+    isLeftServerStarted = 1;
+
+    log_dbg("end");
+}
+
+int masterConnectedEventHandler(int sockfd, struct sockaddr* masterSock)
+{
+    log_dbg("begin sockfd: %d", sockfd);
+
+    masterInfo.socketFD = sockfd;
+    masterInfo.northSockInfo = *((struct sockaddr_in *) masterSock);
+
+    sendMasterLeftPortInfo(sockfd);
+}
+
+int sendMasterLeftPortInfo(int sockfd)
+{
+    log_dbg("begin leftPort: %d", ntohs(leftSocketAddr.sin_port));
+
+    char message[MAX_MSG_LEN];
+    while(!isLeftServerStarted);
+    createLeftSocketPortMessage(ntohs(leftSocketAddr.sin_port), message);
+    sendMessageOnSocket(sockfd, message);
+
+    log_dbg("end message: %s", message);
 }

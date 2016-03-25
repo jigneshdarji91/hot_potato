@@ -9,10 +9,10 @@ CFLAGS=-g -pthread
 all: master player
 
 master:	
-	$(CC) $(CFLAGS) -o master master.c socketlib.c
+	$(CC) $(CFLAGS) -o master master.c socketlib.c potato_protocol.c
 
 player:	speak.o socketlib.o 
-	$(CC) $(CFLAGS) -o player player.c socketlib.c
+	$(CC) $(CFLAGS) -o player player.c socketlib.c potato_protocol.c
 
 
 clean:

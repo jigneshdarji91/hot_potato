@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  master.h
+ *       Filename:  playerinfo.h
  *
- *    Description:  Ring Master
+ *    Description:  stuct to keep player info
  *
  *        Version:  1.0
- *        Created:  03/15/2016 09:16:23 PM
+ *        Created:  03/25/2016 05:07:51 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,15 +16,16 @@
  * =====================================================================================
  */
 
-#ifndef __MASTER_H__
-#define __MASTER_H__
+#ifndef __PLAYERINFO_H__
+#define __PLAYERINFO_H__
 
-#include "socketlib.h"
-#include "playerinfo.h"
 #include "debug.h"
 
-int playerConnectedEventHandler(int sockfd, struct sockaddr_in *playerSock);
-int registerPlayerConnectedEventHandler();
-int allPlayersConnectedEvent();
+typedef struct {
+    int playerID;
+    int socketFD;
+    struct sockaddr_in leftSockInfo;
+    struct sockaddr_in northSockInfo;
+} PlayerInfo;
 
-#endif /* __MASTER_H__ */
+#endif

@@ -21,12 +21,26 @@
 #define MAXMSG  512
 
 typedef int (* clientConnectedCallback)(int sockfd, struct sockaddr_in* clientSock);
+typedef int (* serverConnectedCallback)(int sockfd, struct sockaddr* serverSock);
+typedef int (* serverStartedCallback)(int sockfd, struct sockaddr_in* serverSock);
 
-clientConnectedCallback clientConnected = NULL;; 
+clientConnectedCallback clientConnected = NULL; 
+serverConnectedCallback serverConnected = NULL; 
+serverStartedCallback serverStarted = NULL; 
 
 int registerClientConnectedCallback(void *cb)
 {
     clientConnected = (clientConnectedCallback)cb;
+}
+
+int registerServerConnectedCallback(void *cb)
+{
+    serverConnected = (serverConnectedCallback) cb;
+}
+
+int registerServerStartedCallback(void *cb)
+{
+    serverStarted = (serverStartedCallback) cb;
 }
 
 int sendMessageOnSocket(int filedes, char* nullTermString)
@@ -79,6 +93,7 @@ pthread_t makeSingleClientServer(int port)
         perror ("listen");
         exit (EXIT_FAILURE);
     }
+
 
     pthread_t listenerThread; 
     pthread_create(&listenerThread, NULL, socketServerListener, (void*) sock );
@@ -288,6 +303,13 @@ int createServerSocket(int port)
         exit (EXIT_FAILURE);
     }
 
+    log_inf("host %s, port %hd\n",
+            inet_ntoa (sockinfo.sin_addr),
+            ntohs (sockinfo.sin_port));
+
+    if(serverStarted != NULL)
+        serverStarted(sock, &sockinfo);
+
     log_dbg("end socket: %d", sock);
     return sock;
 }
@@ -299,7 +321,6 @@ pthread_t makeClient(char* host, int port)
     sock = createClientSocketAndConnect(host, port);
     pthread_t listenerThread; 
     pthread_create(&listenerThread, NULL, socketClientListener, &sock );
-    sendMessageOnSocket(sock, "hi");
     log_dbg("end");
     return listenerThread;
 }
@@ -334,6 +355,9 @@ int createClientSocketAndConnect(char* host, int port)
         perror("connect:");
         exit(rc);
     }
+
+    if(serverConnected != NULL)
+        serverConnected(sock, (struct sockaddr *)&sin);
 
     log_dbg("end connection successful");
     return sock;

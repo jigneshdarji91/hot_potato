@@ -27,13 +27,14 @@
 
 #include "master.h"
 
+#define MAX_PLAYERS 100
+
 int noOfPlayersInRing;
 int noOfPlayersConnected;
 int masterPort;
 int noOfHops;
 
-int player1Sock, player2Sock;
-
+PlayerInfo playerList[MAX_PLAYERS];
 // char* log_filename = "master.log";
 
 int main (int argc, char *argv[])
@@ -68,10 +69,13 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
     log_inf("Server: connect from host %s, port %hd\n",
             inet_ntoa (playerSock->sin_addr),
             ntohs (playerSock->sin_port));
-    if(noOfPlayersConnected == 0)
-        player1Sock = sockfd;
+
+    playerList[noOfPlayersConnected].playerID = noOfPlayersConnected;
+    playerList[noOfPlayersConnected].socketFD = sockfd;
+    playerList[noOfPlayersConnected].northSockInfo = *playerSock;
+
     noOfPlayersConnected++;
-    //if(noOfPlayersConnected == noOfPlayersInRing)
+    if(noOfPlayersConnected == noOfPlayersInRing)
     {
         allPlayersConnectedEvent();
     }
@@ -81,6 +85,6 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
 int allPlayersConnectedEvent()
 {
     log_dbg("begin");
-    sendMessageOnSocket(player1Sock, "all connected");
     log_dbg("end");
 }
+

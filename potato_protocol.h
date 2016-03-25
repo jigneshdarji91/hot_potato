@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  master.h
+ *       Filename:  potato_protocol.h
  *
- *    Description:  Ring Master
+ *    Description:  Potato Protocol 
  *
  *        Version:  1.0
- *        Created:  03/15/2016 09:16:23 PM
+ *        Created:  03/25/2016 05:58:43 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,15 +16,12 @@
  * =====================================================================================
  */
 
-#ifndef __MASTER_H__
-#define __MASTER_H__
+#ifndef __POTATO_PROTOCOL_H__
+#define __POTATO_PROTOCOL_H__
 
-#include "socketlib.h"
-#include "playerinfo.h"
 #include "debug.h"
 
-int playerConnectedEventHandler(int sockfd, struct sockaddr_in *playerSock);
-int registerPlayerConnectedEventHandler();
-int allPlayersConnectedEvent();
+int createLeftSocketPortMessage(int port, char* message);
 
-#endif /* __MASTER_H__ */
+
+#endif

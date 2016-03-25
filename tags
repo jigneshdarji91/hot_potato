@@ -6,23 +6,32 @@
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 CC	Makefile	/^CC=gcc$/;"	m
 CFLAGS	Makefile	/^CFLAGS=-g -pthread$/;"	m
-DEBUGGING_MODE	debug.h	30;"	d
+DEBUGGING_MODE	debug.h	27;"	d
 LEN	speak.c	32;"	d	file:
-MAXMSG	socketlib.c	22;"	d	file:
+MAXMSG	socketlib.c	21;"	d	file:
+MAX_PLAYERS	master.c	30;"	d	file:
+PlayerInfo	playerinfo.h	/^} PlayerInfo;$/;"	t	typeref:struct:__anon1
+PlayerInfo	playerinfo.h	/^} PlayerInfo;$/;"	t	typeref:struct:__anon2
 __MASTER_H__	master.h	20;"	d
+__PLAYERINFO_H__	playerinfo.h	20;"	d
 __PLAYER_H__	player.h	20;"	d
+__POTATO_PROTOCOL_H__	potato_protocol.h	20;"	d
 __SOCKETLIB_H__	socketlib.h	20;"	d
 __dbg_h__	debug.h	21;"	d
-createClientSocket	socketlib.c	/^int createClientSocket(char* host, int port)$/;"	f
+allPlayersConnectedEvent	master.c	/^int allPlayersConnectedEvent()$/;"	f
+clientConnected	socketlib.c	/^clientConnectedCallback clientConnected = NULL;; $/;"	v
+clientConnectedCallback	socketlib.c	/^typedef int (* clientConnectedCallback)(int sockfd, struct sockaddr_in* clientSock);$/;"	t	file:
+createClientSocketAndConnect	socketlib.c	/^int createClientSocketAndConnect(char* host, int port)$/;"	f
+createLeftSocketPortMessage	potato_protocol.c	/^int createLeftSocketPortMessage(int port, char* message)$/;"	f
 createServerSocket	socketlib.c	/^int createServerSocket(int port)$/;"	f
 getPeerFromSocketFD	socketlib.c	/^struct sockaddr_in getPeerFromSocketFD(int sock)$/;"	f
-leftPort	player.c	/^int leftPort = 5000;$/;"	v
-log_dbg	debug.h	34;"	d
-log_err	debug.h	31;"	d
-log_filename	master.c	/^char* log_filename = "master.log";$/;"	v
-log_filename	player.c	/^char* log_filename = "player.log";$/;"	v
-log_inf	debug.h	32;"	d
-log_wrn	debug.h	33;"	d
+leftPort	player.c	/^int leftPort = 0; \/\/FIXME: random-port server start$/;"	v
+leftSockInfo	playerinfo.h	/^    struct sockaddr_in leftSockInfo;$/;"	m	struct:__anon1	typeref:struct:__anon1::sockaddr_in
+leftSockInfo	playerinfo.h	/^    struct sockaddr_in leftSockInfo;$/;"	m	struct:__anon2	typeref:struct:__anon2::sockaddr_in
+log_dbg	debug.h	31;"	d
+log_err	debug.h	28;"	d
+log_inf	debug.h	30;"	d
+log_wrn	debug.h	29;"	d
 main	listen.c	/^int main (int argc, char *argv[])$/;"	f
 main	master.c	/^int main (int argc, char *argv[])$/;"	f
 main	player.c	/^int main (int argc, char *argv[])$/;"	f
@@ -34,8 +43,20 @@ masterPort	master.c	/^int masterPort;$/;"	v
 masterPort	player.c	/^int masterPort;$/;"	v
 multiClientServerPacketListener	socketlib.c	/^void* multiClientServerPacketListener(void *sock_)$/;"	f
 noOfHops	master.c	/^int noOfHops;$/;"	v
-noOfPlayersConnected	master.c	/^static int noOfPlayersConnected;$/;"	v	file:
-noOfPlayersInRing	master.c	/^static int noOfPlayersInRing;$/;"	v	file:
+noOfPlayersConnected	master.c	/^int noOfPlayersConnected;$/;"	v
+noOfPlayersInRing	master.c	/^int noOfPlayersInRing;$/;"	v
+northSockInfo	playerinfo.h	/^    struct sockaddr_in northSockInfo;$/;"	m	struct:__anon1	typeref:struct:__anon1::sockaddr_in
+northSockInfo	playerinfo.h	/^    struct sockaddr_in northSockInfo;$/;"	m	struct:__anon2	typeref:struct:__anon2::sockaddr_in
+playerConnectedEventHandler	master.c	/^int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)$/;"	f
+playerID	playerinfo.h	/^    int playerID;$/;"	m	struct:__anon1
+playerID	playerinfo.h	/^    int playerID;$/;"	m	struct:__anon2
+playerList	master.c	/^PlayerInfo playerList[MAX_PLAYERS];$/;"	v
 readMessageOnSocket	socketlib.c	/^int readMessageOnSocket(int filedes)$/;"	f
+registerClientConnectedCallback	socketlib.c	/^int registerClientConnectedCallback(void *cb)$/;"	f
+registerPlayerConnectedEventHandler	master.c	/^int registerPlayerConnectedEventHandler()$/;"	f
+selfInfo	player.c	/^PlayerInfo selfInfo;$/;"	v
 sendMessageOnSocket	socketlib.c	/^int sendMessageOnSocket(int filedes, char* nullTermString)$/;"	f
-socketListener	socketlib.c	/^void* socketListener(void* sock_)$/;"	f
+socketClientListener	socketlib.c	/^void* socketClientListener(void* sock_)$/;"	f
+socketFD	playerinfo.h	/^    int socketFD;$/;"	m	struct:__anon1
+socketFD	playerinfo.h	/^    int socketFD;$/;"	m	struct:__anon2
+socketServerListener	socketlib.c	/^void* socketServerListener(void* sock_)$/;"	f

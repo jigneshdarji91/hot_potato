@@ -21,6 +21,16 @@
 
 #include "debug.h"
 #include "socketlib.h"
+#include "playerinfo.h"
 
+//Event Handler
+int registerEventHandlers();
+int registerMasterConnectedEventHandler();
+int registerServerStartedEventHandler();
+int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSockAddr);
+int masterConnectedEventHandler(int sockfd, struct sockaddr* masterSock);
+
+//Communication
+int sendMasterLeftPortInfo(int sockfd);
 
 #endif
