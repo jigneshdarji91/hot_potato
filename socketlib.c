@@ -20,7 +20,7 @@
 
 #define MAXMSG  512
 
-typedef int (* clientConnectedCallback)(struct sockaddr_in* clientSock);
+typedef int (* clientConnectedCallback)(int sockfd, struct sockaddr_in* clientSock);
 
 clientConnectedCallback clientConnected = NULL;; 
 
@@ -166,17 +166,17 @@ void* multiClientServerPacketListener(void *sock_)
                 if (i == sock)
                 {
                     // Connection request 
-                    int new;
+                    int newSock;
                     size = sizeof (clientname);
-                    new = accept (sock,
+                    newSock = accept (sock,
                             (struct sockaddr *) &clientname,
                             &size);
-                    if (new < 0)
+                    if (newSock < 0)
                     {
                         perror ("accept");
                         exit (EXIT_FAILURE);
                     }
-                    FD_SET (new, &active_fd_set);
+                    FD_SET (newSock, &active_fd_set);
                     //TODO: client connected
                     log_inf("Server: connect from host %s, port %hd\n",
                             inet_ntoa (clientname.sin_addr),
@@ -184,7 +184,7 @@ void* multiClientServerPacketListener(void *sock_)
                     log_inf("player connected")
                     // sendMessageOnSocket(sock, message);
                     if(clientConnected != NULL)
-                        clientConnected(&clientname);
+                        clientConnected(newSock, &clientname);
                 }
                 else
                 {
