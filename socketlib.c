@@ -81,13 +81,51 @@ pthread_t makeSingleClientServer(int port)
     }
 
     pthread_t listenerThread; 
-    pthread_create(&listenerThread, NULL, socketListener, (void*) sock );
+    pthread_create(&listenerThread, NULL, socketServerListener, (void*) sock );
     
     log_dbg("end");
     return listenerThread;
 }
 
-void* socketListener(void* sock_)
+void* socketClientListener(void* sock_)
+{
+    int sock = *((int*) sock_);
+    log_dbg("begin socket: %d FD_SETSIZE: %d", sock, FD_SETSIZE);
+    socklen_t size;
+    struct sockaddr_in clientname;
+    fd_set active_fd_set, read_fd_set;
+
+    /*  Initialize the set of active sockets. */
+    FD_ZERO (&active_fd_set);
+    FD_SET (sock, &active_fd_set);
+
+    while (1)
+    {
+        /*  Block until input arrives on one or more
+         *  active sockets. */
+        read_fd_set = active_fd_set;
+        if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0)
+        {
+            perror ("select");
+            exit (EXIT_FAILURE);
+        }
+
+        /*  Service all the sockets with input pending. */
+        int i = 0;
+        for (; i < FD_SETSIZE; ++i)
+        {
+            if (FD_ISSET (i, &read_fd_set))
+            {
+                // connected socket 
+                readMessageOnSocket(i);
+            }
+        }
+    }
+    log_dbg("end");
+
+}
+
+void* socketServerListener(void* sock_)
 {
     log_dbg("begin");
 
@@ -260,7 +298,7 @@ pthread_t makeClient(char* host, int port)
     int sock;
     sock = createClientSocketAndConnect(host, port);
     pthread_t listenerThread; 
-    pthread_create(&listenerThread, NULL, socketListener, &sock );
+    pthread_create(&listenerThread, NULL, socketClientListener, &sock );
     sendMessageOnSocket(sock, "hi");
     log_dbg("end");
     return listenerThread;

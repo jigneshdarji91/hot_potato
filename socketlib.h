@@ -34,7 +34,8 @@
 int sendMessageOnSocket(int filedes, char* nullTermString);
 int readMessageOnSocket(int filedes);
 pthread_t makeSingleClientServer(int port);
-void* socketListener(void* sock);
+void* socketServerListener(void* sock);
+void* socketClientListener(void* sock);
 pthread_t makeMultiClientServer(/*TODO: call back*/ int port );
 void* multiClientServerPacketListener(void* sock);
 int createServerSocket(int port);
