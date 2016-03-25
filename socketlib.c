@@ -17,9 +17,17 @@
  */
 
 #include "socketlib.h"
-#include <arpa/inet.h>
 
 #define MAXMSG  512
+
+typedef int (* clientConnectedCallback)(struct sockaddr_in* clientSock);
+
+clientConnectedCallback clientConnected = NULL;; 
+
+int registerClientConnectedCallback(void *cb)
+{
+    clientConnected = (clientConnectedCallback)cb;
+}
 
 int sendMessageOnSocket(int filedes, char* nullTermString)
 {
@@ -102,7 +110,6 @@ void* socketListener(void* sock_)
         {
             if (FD_ISSET (i, &read_fd_set))
             {
-                log_dbg("pending input on socket %d", i);
                 if( readMessageOnSocket (i) < 0)
                     break;
             }
@@ -176,6 +183,8 @@ void* multiClientServerPacketListener(void *sock_)
                             ntohs (clientname.sin_port));
                     log_inf("player connected")
                     // sendMessageOnSocket(sock, message);
+                    if(clientConnected != NULL)
+                        clientConnected(&clientname);
                 }
                 else
                 {

@@ -46,7 +46,24 @@ int main (int argc, char *argv[])
     masterPort = atoi(argv[1]);
     noOfPlayersInRing = atoi(argv[2]);
     noOfHops = atoi(argv[3]);
+
+    registerPlayerConnectedEventHandler();
+
     log_inf("master: port=%d players=%d hops=%d", masterPort, noOfPlayersInRing, noOfHops);
     pthread_t threadId = makeMultiClientServer(masterPort);
     pthread_join(threadId, NULL);
+}
+
+int registerPlayerConnectedEventHandler()
+{
+    registerClientConnectedCallback(playerConnectedEvent);
+}
+
+int playerConnectedEvent(struct sockaddr_in playerSock)
+{
+    log_dbg("begin");
+    log_inf("Server: connect from host %s, port %hd\n",
+            inet_ntoa (playerSock.sin_addr),
+            ntohs (playerSock.sin_port));
+    log_dbg("end");
 }

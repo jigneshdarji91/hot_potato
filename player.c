@@ -28,7 +28,7 @@
 #include "player.h"
 
 int masterPort;
-int leftPort = 5000;
+int leftPort = 0; //FIXME: random-port server start
 
 char* log_filename = "player.log";
 

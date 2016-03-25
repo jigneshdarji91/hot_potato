@@ -30,6 +30,8 @@
 *.hex
 speak
 listen
+master
+player
 
 # Debug files
 *.dSYM/
