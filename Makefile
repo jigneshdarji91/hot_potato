@@ -1,30 +1,28 @@
 #
 #
 CC=gcc
-CFLAGS=-g
+CFLAGS=-g -pthread
 
 # comment line below for Linux machines
 #LIB= -lsocket -lnsl
 
-all: listen speak
+all: master player
 
-listen:	listen.o
-	$(CC) $(CFLAGS) -o $@ listen.o $(LIB)
+master:	
+	$(CC) $(CFLAGS) -o master master.c socketlib.c
 
-speak:	speak.o
-	$(CC) $(CFLAGS) -o $@ speak.o $(LIB)
+player:	speak.o socketlib.o 
+	$(CC) $(CFLAGS) -o player player.c socketlib.c
 
-listen.o:	listen.c
-
-speak.o:	speak.c 
 
 clean:
-	\rm -f listen speak
+	\rm -f master player
+	\rm *.o
 
 squeaky:
 	make clean
-	\rm -f listen.o speak.o
+	\rm -f master.o player.o
 
 tar:
-	cd ..; tar czvf socket.tar.gz socket/Makefile socket/listen.c socket/speak.c socket/README; cd socket; mv ../socket.tar.gz .
+	#cd ..; tar czvf socket.tar.gz socket/Makefile socket/listen.c socket/speak.c socket/README; cd socket; mv ../socket.tar.gz .
 

@@ -25,87 +25,26 @@
  *  a. If non-zero, send to right neighbor
  *  b. Else, append signature and send to Master and close program */
 
+#include "player.h"
 
-void connectToMaster()
+int masterPort;
+int leftPort = 5000;
+
+char* log_filename = "player.log";
+
+int main (int argc, char *argv[])
 {
+    if( argc < 3)
+    {
+        fprintf(stderr, "Usage: %s <master IP> <master port> \n", argv[0]);
+        exit(1);
+    }
 
+    masterPort = atoi(argv[2]);
+    log_inf("player: master=%s port=%d", argv[1], masterPort);
+    pthread_t leftThreadId = makeSingleClientServer(leftPort);
+    pthread_t masterThreadId = makeClient(argv[1], masterPort);
+
+    pthread_join(masterThreadId, NULL);
+    pthread_join(leftThreadId, NULL);
 }
-
-void listenForLeftNeighbor()
-{
-
-}
-
-void leftNeighborConnected()
-{
-
-}
-
-void neighborInfoSentByMaster()
-{
-    connectToRightNeighbor();
-}
-
-void checkConnectionAndInformMaster()
-{
-    if(isConnectedToBothNeighbors())
-        informMasterConnectionComplete();
-}
-
-void informMasterConnectionComplete()
-{
-
-}
-
-void connectToRightNeighbor()
-{
-
-}
-
-bool isConnectedToBothNeighbors()
-{
-    if(selfInfo->isLeftConnected &&
-        selfInfo->isRightConnected)
-        return true;
-    return false;
-}
-
-void potatoReceivedEvent()
-{
-    appendSignatureToPotato();
-    sendPotatoToRandomNeighbor();
-}
-
-void appendSignatureToPotato()
-{
-
-}
-
-void sendPotatoToRandomNeighbor()
-{
-
-}
-
-void killSelfEvent()
-{
-    closeConnections();
-    //exit(0);
-}
-
-void closeConnections()
-{
-    closeLeftConnection();
-    closeRightConnection();
-}
-
-void closeLeftConnection()
-{
-
-}
-
-void closeRightConnection()
-{
-
-}
-
-

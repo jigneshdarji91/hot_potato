@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  master.h
+ *       Filename:  player.h
  *
- *    Description:  Ring Master
+ *    Description:  player
  *
  *        Version:  1.0
- *        Created:  03/15/2016 09:16:23 PM
+ *        Created:  03/25/2016 12:59:29 AM
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,10 +16,11 @@
  * =====================================================================================
  */
 
-#ifndef __MASTER_H__
-#define __MASTER_H__
+#ifndef __PLAYER_H__
+#define __PLAYER_H__
 
-#include "socketlib.h"
 #include "debug.h"
+#include "socketlib.h"
 
-#endif /* __MASTER_H__ */
+
+#endif

@@ -1,0 +1,41 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CC	Makefile	/^CC=gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS=-g -pthread$/;"	m
+DEBUGGING_MODE	debug.h	30;"	d
+LEN	speak.c	32;"	d	file:
+MAXMSG	socketlib.c	22;"	d	file:
+__MASTER_H__	master.h	20;"	d
+__PLAYER_H__	player.h	20;"	d
+__SOCKETLIB_H__	socketlib.h	20;"	d
+__dbg_h__	debug.h	21;"	d
+createClientSocket	socketlib.c	/^int createClientSocket(char* host, int port)$/;"	f
+createServerSocket	socketlib.c	/^int createServerSocket(int port)$/;"	f
+getPeerFromSocketFD	socketlib.c	/^struct sockaddr_in getPeerFromSocketFD(int sock)$/;"	f
+leftPort	player.c	/^int leftPort = 5000;$/;"	v
+log_dbg	debug.h	34;"	d
+log_err	debug.h	31;"	d
+log_filename	master.c	/^char* log_filename = "master.log";$/;"	v
+log_filename	player.c	/^char* log_filename = "player.log";$/;"	v
+log_inf	debug.h	32;"	d
+log_wrn	debug.h	33;"	d
+main	listen.c	/^int main (int argc, char *argv[])$/;"	f
+main	master.c	/^int main (int argc, char *argv[])$/;"	f
+main	player.c	/^int main (int argc, char *argv[])$/;"	f
+main	speak.c	/^int main (int argc, char *argv[])$/;"	f
+makeClient	socketlib.c	/^pthread_t makeClient(char* host, int port)$/;"	f
+makeMultiClientServer	socketlib.c	/^pthread_t makeMultiClientServer(\/*TODO: call back*\/ int port )$/;"	f
+makeSingleClientServer	socketlib.c	/^pthread_t makeSingleClientServer(int port)$/;"	f
+masterPort	master.c	/^int masterPort;$/;"	v
+masterPort	player.c	/^int masterPort;$/;"	v
+multiClientServerPacketListener	socketlib.c	/^void* multiClientServerPacketListener(void *sock_)$/;"	f
+noOfHops	master.c	/^int noOfHops;$/;"	v
+noOfPlayersConnected	master.c	/^static int noOfPlayersConnected;$/;"	v	file:
+noOfPlayersInRing	master.c	/^static int noOfPlayersInRing;$/;"	v	file:
+readMessageOnSocket	socketlib.c	/^int readMessageOnSocket(int filedes)$/;"	f
+sendMessageOnSocket	socketlib.c	/^int sendMessageOnSocket(int filedes, char* nullTermString)$/;"	f
+socketListener	socketlib.c	/^void* socketListener(void* sock_)$/;"	f

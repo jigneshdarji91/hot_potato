@@ -25,83 +25,28 @@
  * 6. Print the stack and kill them all
  */
 
+#include "master.h"
+
 static int noOfPlayersInRing;
 static int noOfPlayersConnected;
+int masterPort;
+int noOfHops;
 
+char* log_filename = "master.log";
 
-// Callback function from listener if connection is established
-void registerPlayerEvent() 
-{
-    //add info to connectedPlayerMap     
-    noOfPlayersConnected++;
-    checkAndSetupRing();
-}
-
-void checkAndSetupRing()
-{
-    if(isEveryoneConnectedToMaster())
-        everyoneConnectedEvent();
-}
-
-void playerConnectedToNeighborEvent(p)
-{
-    //update PlayerInfo
-    if(isRingComplete())
-        sendPotato();
-}
-
-void everyoneConnectedEvent()
-{
-    sendNeighborInfoToEveryone();
-}
-
-void sendNeighborInfoToEveryone()
-{
-    //for all players p
-    sendNeighborInfoToPlayer(p);
-}
-
-void sendNeighborInfoToPlayer(PlayerInfo p)
-{
-    //encode p->right in message such that serialization is possible
-}
-
-bool isEveryoneConnectedToMaster()
-{
-    return (noOfPlayersInRing == noOfPlayersConnected)? true : false;
-}
-
-bool isRingComplete()
-{
-    //for each PlayerInfo, check neighborConnected flag
-}
-
-void sendPotato()
-{
-    // 1. Pick a random player
-    // 2. Send
-    // 3. Wait
-}
-
-void killPlayer(PlayerInfo p)
+int main (int argc, char *argv[])
 {
 
+    if( argc < 4)
+    {
+        fprintf(stderr, "Usage: %s <port> <no. of players> <hops>\n", argv[0]);
+        exit(1);
+    }
+
+    masterPort = atoi(argv[1]);
+    noOfPlayersInRing = atoi(argv[2]);
+    noOfHops = atoi(argv[3]);
+    log_inf("master: port=%d players=%d hops=%d", masterPort, noOfPlayersInRing, noOfHops);
+    pthread_t threadId = makeMultiClientServer(masterPort);
+    pthread_join(threadId, NULL);
 }
-
-void killNetwork()
-{
-    //for all PlayerInfo p
-    killPlayer(p);
-}
-
-void potatoReturnEvent()
-{
-    printPotatoPath();
-    killNetwork();
-}
-
-void printPotatoPath()
-{
-
-}
-
