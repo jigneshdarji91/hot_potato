@@ -39,7 +39,7 @@ pthread_t makeMultiClientServer(/*TODO: call back*/ int port );
 void* multiClientServerPacketListener(void* sock);
 int createServerSocket(int port);
 pthread_t makeClient(char* host, int port);
-int createClientSocket(char* host, int port);
+int createClientSocketAndConnect(char* host, int port);
 struct sockaddr_in getPeerFromSocketFD(int sock);
 int registerClientConnectedCallback(void *cb);
 

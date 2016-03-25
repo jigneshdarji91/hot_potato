@@ -71,17 +71,17 @@ pthread_t makeSingleClientServer(int port)
 {
     log_dbg("begin");
 
-    int sock;
-    sock = createServerSocket(port);
+    int *sock = malloc(sizeof(int));
+    *sock = createServerSocket(port);
 
-    if (listen (sock, 1) < 0)
+    if (listen (*sock, 1) < 0)
     {
         perror ("listen");
         exit (EXIT_FAILURE);
     }
 
     pthread_t listenerThread; 
-    pthread_create(&listenerThread, NULL, socketListener, &sock );
+    pthread_create(&listenerThread, NULL, socketListener, (void*) sock );
     
     log_dbg("end");
     return listenerThread;
@@ -92,14 +92,16 @@ void* socketListener(void* sock_)
     log_dbg("begin");
 
     //FIXME: how different should player's listener be different from masters?
+    int sock = *((int *) sock_);
     multiClientServerPacketListener(sock_);
     /* 
-    int sock = *((int *) sock_);
-    fd_set read_fd_set;
+    struct sockaddr_in clientname;
+    socklen_t size;
+    fd_set read_fd_set, active_fd_set;
 
     // Initialize the set of active sockets. 
-    FD_ZERO (&read_fd_set);
-    FD_SET (sock, &read_fd_set);
+    FD_ZERO (&active_fd_set);
+    FD_SET (sock, &active_fd_set);
 
     while ( 1 ) {
         if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0)
@@ -131,10 +133,7 @@ void* socketListener(void* sock_)
                     log_inf("Server: connect from host %s, port %hd\n",
                             inet_ntoa (clientname.sin_addr),
                             ntohs (clientname.sin_port));
-                    log_inf("player connected")
-                        // sendMessageOnSocket(sock, message);
-                        if(clientConnected != NULL)
-                            clientConnected(newSock, &clientname);
+                    log_inf("player connected");
                 }
                 else
                 {
@@ -150,23 +149,23 @@ void* socketListener(void* sock_)
 
 pthread_t makeMultiClientServer(/*TODO: call back*/ int port )
 {
-    log_dbg("begin port: %d", port);
-
-    int sock = createServerSocket(port);
-    if (listen (sock, 1) < 0)
+    int *sock = malloc(sizeof(int *));
+    *sock = createServerSocket(port);
+    log_dbg("begin port: %d sock: %d", port, *sock);
+    if (listen (*sock, 1) < 0)
     {
         perror ("listen");
         exit (EXIT_FAILURE);
     }
     pthread_t listenerThread; 
-    pthread_create(&listenerThread, NULL, multiClientServerPacketListener, &sock );
+    pthread_create(&listenerThread, NULL, multiClientServerPacketListener, (void*) sock );
     log_dbg("end");
     return listenerThread;
 }
 
 void* multiClientServerPacketListener(void *sock_)
 {
-    int sock = *((int *) sock_);
+    int sock = *((int*) sock_);
     log_dbg("begin socket: %d FD_SETSIZE: %d", sock, FD_SETSIZE);
     socklen_t size;
     struct sockaddr_in clientname;
@@ -211,7 +210,7 @@ void* multiClientServerPacketListener(void *sock_)
                     log_inf("Server: connect from host %s, port %hd\n",
                             inet_ntoa (clientname.sin_addr),
                             ntohs (clientname.sin_port));
-                    log_inf("player connected")
+                    log_inf("player connected");
                     // sendMessageOnSocket(sock, message);
                     if(clientConnected != NULL)
                         clientConnected(newSock, &clientname);
@@ -259,7 +258,7 @@ pthread_t makeClient(char* host, int port)
 {
     log_dbg("begin host: %s port: %d", host, port);
     int sock;
-    sock = createClientSocket(host, port);
+    sock = createClientSocketAndConnect(host, port);
     pthread_t listenerThread; 
     pthread_create(&listenerThread, NULL, socketListener, &sock );
     sendMessageOnSocket(sock, "hi");
@@ -267,7 +266,7 @@ pthread_t makeClient(char* host, int port)
     return listenerThread;
 }
 
-int createClientSocket(char* host, int port)
+int createClientSocketAndConnect(char* host, int port)
 {
     log_dbg("begin");
 

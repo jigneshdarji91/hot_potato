@@ -22,7 +22,8 @@
 #include "socketlib.h"
 #include "debug.h"
 
-int playerConnectedEvent(int sockfd, struct sockaddr_in *playerSock);
+int playerConnectedEventHandler(int sockfd, struct sockaddr_in *playerSock);
 int registerPlayerConnectedEventHandler();
+int allPlayersConnectedEvent();
 
 #endif /* __MASTER_H__ */

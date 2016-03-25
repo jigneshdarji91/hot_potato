@@ -27,12 +27,14 @@
 
 #include "master.h"
 
-static int noOfPlayersInRing;
-static int noOfPlayersConnected;
+int noOfPlayersInRing;
+int noOfPlayersConnected;
 int masterPort;
 int noOfHops;
 
-char* log_filename = "master.log";
+int player1Sock, player2Sock;
+
+// char* log_filename = "master.log";
 
 int main (int argc, char *argv[])
 {
@@ -45,6 +47,7 @@ int main (int argc, char *argv[])
 
     masterPort = atoi(argv[1]);
     noOfPlayersInRing = atoi(argv[2]);
+    noOfPlayersConnected = 0;
     noOfHops = atoi(argv[3]);
 
     registerPlayerConnectedEventHandler();
@@ -56,14 +59,28 @@ int main (int argc, char *argv[])
 
 int registerPlayerConnectedEventHandler()
 {
-    registerClientConnectedCallback(playerConnectedEvent);
+    registerClientConnectedCallback(playerConnectedEventHandler);
 }
 
-int playerConnectedEvent(int sockfd, struct sockaddr_in* playerSock)
+int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
 {
     log_dbg("begin sockfd: %d", sockfd);
     log_inf("Server: connect from host %s, port %hd\n",
             inet_ntoa (playerSock->sin_addr),
             ntohs (playerSock->sin_port));
+    if(noOfPlayersConnected == 0)
+        player1Sock = sockfd;
+    noOfPlayersConnected++;
+    //if(noOfPlayersConnected == noOfPlayersInRing)
+    {
+        allPlayersConnectedEvent();
+    }
+    log_dbg("end noOfPlayersConnected: %d", noOfPlayersConnected);
+}
+
+int allPlayersConnectedEvent()
+{
+    log_dbg("begin");
+    sendMessageOnSocket(player1Sock, "all connected");
     log_dbg("end");
 }

@@ -30,7 +30,7 @@
 int masterPort;
 int leftPort = 0; //FIXME: random-port server start
 
-char* log_filename = "player.log";
+//char* log_filename = "player.log";
 
 int main (int argc, char *argv[])
 {
