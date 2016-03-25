@@ -91,10 +91,13 @@ void* socketListener(void* sock_)
 {
     log_dbg("begin");
 
+    //FIXME: how different should player's listener be different from masters?
+    multiClientServerPacketListener(sock_);
+    /* 
     int sock = *((int *) sock_);
     fd_set read_fd_set;
 
-    /*  Initialize the set of active sockets. */
+    // Initialize the set of active sockets. 
     FD_ZERO (&read_fd_set);
     FD_SET (sock, &read_fd_set);
 
@@ -110,11 +113,38 @@ void* socketListener(void* sock_)
         {
             if (FD_ISSET (i, &read_fd_set))
             {
-                if( readMessageOnSocket (i) < 0)
-                    break;
+                if(i == sock)
+                {
+                    // Connection request 
+                    int newSock;
+                    size = sizeof (clientname);
+                    newSock = accept (sock,
+                            (struct sockaddr *) &clientname,
+                            &size);
+                    if (newSock < 0)
+                    {
+                        perror ("accept");
+                        exit (EXIT_FAILURE);
+                    }
+                    FD_SET (newSock, &active_fd_set);
+                    //TODO: client connected
+                    log_inf("Server: connect from host %s, port %hd\n",
+                            inet_ntoa (clientname.sin_addr),
+                            ntohs (clientname.sin_port));
+                    log_inf("player connected")
+                        // sendMessageOnSocket(sock, message);
+                        if(clientConnected != NULL)
+                            clientConnected(newSock, &clientname);
+                }
+                else
+                {
+                    if( readMessageOnSocket (i) < 0)
+                        break;
+                }
             }
         }
     }
+    */
     log_dbg("end");
 }
 
