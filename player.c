@@ -206,6 +206,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
         fprintf(stdout, "I'm it\n");
         createPotatoMessage(hopsLeft, path, message);
         sendMessageOnSocket(masterInfo.socketFD, message); 
+        shutdownListenerThreads();
         shutdownSockets();
     }
 
