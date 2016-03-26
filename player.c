@@ -106,6 +106,7 @@ int leftNeighborConnectedEventHandler(int sockfd, struct sockaddr_in* leftSock)
             inet_ntoa (leftSock->sin_addr),
             ntohs (leftSock->sin_port));
 
+    log_inf("left player connected sockfd: %d", sockfd);
     leftInfo.socketFD = sockfd;
     leftInfo.selfSockInfo = *leftSock;
     
@@ -125,7 +126,7 @@ int masterConnectedEventHandler(int sockfd, struct sockaddr* sock)
     }
     else
     {
-        log_inf("right player connected");
+        log_inf("right player connected sockfd: %d", sockfd);
         rightInfo.socketFD = sockfd;
         rightInfo.leftSockInfo = *((struct sockaddr_in *) sock);
         sendRightACKToMaster(masterInfo.socketFD);
@@ -182,24 +183,29 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
     log_inf("potato path: %s", path);
 
     //TODO: verify whether to return on 1 or 0
-    if(hopsLeft)
+    if(hopsLeft > 0)
     {
         hopsLeft--;
         createPotatoMessage(hopsLeft, path, message);
         int r = rand() % 2;
         int playerID = -1;
+        int socketFD = -1;
         if(r == 1)
         {
+            socketFD = leftInfo.socketFD;
             playerID = leftInfo.playerID;
-            sendMessageOnSocket(leftInfo.socketFD, message);
         }
         else 
         {
+            socketFD = rightInfo.socketFD;
             playerID = rightInfo.playerID;
-            sendMessageOnSocket(rightInfo.socketFD, message); 
         }
+
+        //FIXME: remove hopsLeft from the print
         fprintf(stdout, "Sending potato to %d hopsLeft: %d\n", playerID, hopsLeft);
-        log_inf("Sending potato to %d hopsLeft: %d", playerID, hopsLeft);
+        log_inf("Sending potato to %d hopsLeft: %d sockfd: %d", playerID, hopsLeft, socketFD);
+
+        sendMessageOnSocket(leftInfo.socketFD, message);
     }
     else
     {

@@ -234,12 +234,12 @@ int sendIDToPlayer(int playerID)
     int rightNeighbor = (playerID + 1) % noOfPlayersInRing;
     int leftNeighbor = (playerID == 0)?(noOfPlayersInRing - 1):(playerID - 1);
     createPlayerIDMessage(playerID,
-            rightNeighbor,
             leftNeighbor,
+            rightNeighbor,
             message);
     sendMessageOnSocket(playerList[playerID].socketFD, message);
 
-    log_dbg("end");
+    log_dbg("end playerID: %d leftID: %d rightID: %d", playerID, leftNeighbor, rightNeighbor);
 }
 
 int sendPlayerIDsToAll()
