@@ -145,10 +145,10 @@ void* socketClientListener(void* sock_)
 
 void* socketServerListener(void* sock_)
 {
-    log_dbg("begin");
+    int sock = *((int *) sock_);
+    log_dbg("begin socket: %d FD_SETSIZE: %d", sock, FD_SETSIZE);
 
     //FIXME: how different should player's listener be different from masters?
-    int sock = *((int *) sock_);
     multiClientServerPacketListener(sock_);
     /* 
     struct sockaddr_in clientname;
@@ -320,10 +320,10 @@ int createServerSocket(int port)
 pthread_t makeClient(char* host, int port)
 {
     log_dbg("begin host: %s port: %d", host, port);
-    int sock;
-    sock = createClientSocketAndConnect(host, port);
+    int *sock = malloc(sizeof(int));
+    *sock = createClientSocketAndConnect(host, port);
     pthread_t listenerThread; 
-    pthread_create(&listenerThread, NULL, socketClientListener, &sock );
+    pthread_create(&listenerThread, NULL, socketClientListener, sock );
     log_dbg("end");
     return listenerThread;
 }
