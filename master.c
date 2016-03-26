@@ -170,6 +170,14 @@ int rightACKReceivedHandler(int sockfd)
 int ringCompleteEvent()
 {
     log_dbg("begin");
+    //LET THE GAME OF POTATO BEGIN 
+    
+    char message[MAX_MSG_LEN];
+    int r = rand() % noOfPlayersInRing;
+
+    createNewPotato(noOfHops, message);
+    sendMessageOnSocket(playerList[r].socketFD, message);
+
     log_dbg("end");
 }
 

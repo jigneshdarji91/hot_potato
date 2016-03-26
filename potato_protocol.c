@@ -27,11 +27,18 @@ typedef int (* leftPortReceivedCallback)(int sockfd, int port);
 typedef int (* playerIDReceivedCallback)(int sockfd, int port);
 typedef int (* rightACKReceivedCallback)(int sockfd);
 typedef int (* rightInfoReceivedCallback)(int sockfd, char* host, int portno);
+typedef int (* potatoReceivedCallback)(int sockfd, int hopsLeft, char* path);
 
 leftPortReceivedCallback leftPortReceived = NULL;
 playerIDReceivedCallback playerIDReceived = NULL;
 rightACKReceivedCallback rightACKReceived = NULL;
 rightInfoReceivedCallback rightInfoReceived = NULL; 
+potatoReceivedCallback potatoReceived = NULL;
+
+int registerPotatoReceivedCallback(void *cb)
+{
+    potatoReceived = (potatoReceivedCallback) cb;
+}
 
 int registerLeftPortReceivedOnMasterCallback(void *cb)
 {
@@ -51,6 +58,23 @@ int registerPlayerIDReceivedOnPlayerCallback(void *cb)
 int registerRightInfoReceivedOnPlayerCallback(void *cb)
 {
     rightInfoReceived = (rightInfoReceivedCallback) cb;
+}
+
+int createNewPotato(int noOfHops, char* message)
+{
+    log_dbg("begin");
+    
+    strcpy(message, "MESSAGE_TYPE:POTATO;");
+    
+    strcat(message, "PATH:;");
+
+    char hopString[32];
+    sprintf(hopString, "%d", noOfHops);
+    strcat(message, "HOPCOUNT:");
+    strcat(message, hopString);
+    strcat(message, ";");
+
+    log_dbg("end messsage: %s", message);
 }
 
 int createLeftSocketPortMessage(int port, char* message)
@@ -230,6 +254,7 @@ int parsePotatoOnPlayer(int sockfd, char* message)
 {
 
 }
+
 int parsePotatoOnMaster(int sockfd, char* message)
 {
 
