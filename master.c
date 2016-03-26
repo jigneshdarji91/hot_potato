@@ -82,6 +82,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
     
     fprintf(stdout, "Trace of potato:\n%s", path);
     shutdownAllPlayers();
+    shutdownAllSockets();
     log_dbg("end");
 }
 
@@ -97,6 +98,20 @@ int shutdownAllPlayers()
     }
     log_dbg("end");
 }
+
+int shutdownAllSockets()
+{
+    log_dbg("begin");
+
+    int i = 0;
+    for(; i < noOfPlayersConnected; ++i)
+    {
+        shutdown(playerList[i].socketFD, 2);
+    }
+
+    log_dbg("end");
+}
+
 int leftPortReceivedHandler(int sockfd, int port)
 {
     log_dbg("begin sockfd: %d port: %d htons(port): %d", sockfd, port, htons(port));

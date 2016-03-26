@@ -235,9 +235,9 @@ int shutdownSockets()
 {
     log_dbg("begin");
     
-    close(leftInfo.socketFD);
-    close(masterInfo.socketFD);
-    close(rightInfo.socketFD);
+    shutdown(leftInfo.socketFD, 2);
+    shutdown(masterInfo.socketFD, 2);
+    shutdown(rightInfo.socketFD, 2);
 
     log_dbg("end");
 }

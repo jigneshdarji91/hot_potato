@@ -22,6 +22,7 @@
 #include "debug.h"
 
 int createLeftSocketPortMessage(int port, char* message);
+int createShutdownMessage(char* message);
 int createPlayerIDMessage(int playerID, int leftNeighborID, int rightNeighborID, char* message);
 int createPotatoMessage(int noOfHops, char* path, char* message);
 int createRightNeighborInfoMessage(char* host, char* port, char* message);
