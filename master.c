@@ -63,7 +63,9 @@ int main (int argc, char *argv[])
     log_inf("master: port=%d players=%d hops=%d", masterPort, noOfPlayersInRing, noOfHops);
     pthread_t threadId = makeMultiClientServer(masterPort);
 
-    fprintf(stdout, "Potato Master on %s\n", gethostbyname("0.0.0.0")->h_name);
+    char host[64];
+    gethostname(host, sizeof(host));
+    fprintf(stdout, "Potato Master on %s\n", gethostbyname(host)->h_name);
     fprintf(stdout, "Players = %d\n", noOfPlayersInRing);
     fprintf(stdout, "Hops = %d\n", noOfHops);
 
@@ -143,7 +145,7 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
     log_inf("Server: connect from host %s, port %hd\n",
             inet_ntoa (playerSock->sin_addr),
             ntohs (playerSock->sin_port));
-    
+
     int playerID = noOfPlayersConnected;
     playerList[playerID].playerID = playerID;
     playerList[playerID].socketFD = sockfd;
@@ -152,9 +154,13 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
 
     noOfPlayersConnected++;
 
+    struct hostent *playerHostent;
+    playerHostent = gethostbyaddr((char*) &playerList[playerID].northSockInfo.sin_addr,
+            sizeof(struct in_addr), AF_INET);
     fprintf(stdout, "player %d is on %s\n", 
             playerList[playerID].playerID, 
-            gethostbyname(inet_ntoa(playerList[playerID].northSockInfo.sin_addr))->h_name);
+            /* gethostbyaddr(inet_ntoa(playerList[playerID].northSockInfo.sin_addr))->h_name */
+            playerHostent->h_name);
 
     sendIDToPlayer(playerID);
     log_dbg("end noOfPlayersConnected: %d", noOfPlayersConnected);
