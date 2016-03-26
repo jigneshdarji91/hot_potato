@@ -83,7 +83,6 @@ int createPlayerIDMessage(int playerID, int leftNeighborID, int rightNeighborID,
 {
     log_dbg("begin");
 
-
     strcpy(message, "MESSAGE_TYPE:PLAYERID;");
 
     char pID[32], leftID[32], rightID[32];

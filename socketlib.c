@@ -18,6 +18,7 @@
 
 #include "socketlib.h"
 #include "potato_protocol.h"
+#include <netinet/tcp.h>
 
 #define MAXMSG  9616
 
@@ -307,6 +308,18 @@ int createServerSocket(int port)
         exit (EXIT_FAILURE);
     }
 
+    int flag = 1;
+    int result = setsockopt(sock,            /*  socket affected */
+            IPPROTO_TCP,     /*  set option at TCP level */
+            TCP_NODELAY,     /*  name of option */
+            (char *) &flag,  /*  the cast is historical
+                                 cruft */
+            sizeof(int));    /*  length of option value */
+    if (result < 0)
+    {
+        log_err("ERROR: TCP_NODELAY failed");
+    }
+
     log_inf("host %s, port %hd\n",
             inet_ntoa (sockinfo.sin_addr),
             ntohs (sockinfo.sin_port));
@@ -348,7 +361,17 @@ int createClientSocketAndConnect(char* host, int port)
         perror("socket:");
         exit(sock);
     }
-
+    int flag = 1;
+    int result = setsockopt(sock,            /*  socket affected */
+            IPPROTO_TCP,     /*  set option at TCP level */
+            TCP_NODELAY,     /*  name of option */
+            (char *) &flag,  /*  the cast is historical
+                                 cruft */
+            sizeof(int));    /*  length of option value */
+    if (result < 0)
+    {
+        log_err("ERROR: TCP_NODELAY failed");
+    }
     sin.sin_family = AF_INET;
     sin.sin_port = htons(port);
     memcpy(&sin.sin_addr, hp->h_addr_list[0], hp->h_length);
