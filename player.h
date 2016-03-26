@@ -31,6 +31,7 @@ int masterConnectedEventHandler(int sockfd, struct sockaddr* masterSock);
 int rightInfoReceivedHandler(int sockfd, char* host, int port);
 int potatoReceivedHandler(int sockfd, int hopsLeft, char* path);
 int playerIDReceivedHandler(int sockfd, int selfID, int leftID, int rightID);
+int shutdownReceivedHandler(int sockfd);
 
 //Communication
 int sendLeftPortToMaster(int sockfd);

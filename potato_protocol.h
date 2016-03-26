@@ -33,6 +33,7 @@ int parseMessageLeftPortOnMaster(int sockfd, char* message);
 int parseMessageRightConnectedOnMaster(int sockfd, char* message);
 int parseMessagePlayerIDOnPlayer(int sockfd, char* message);
 int parseMessageRightInfoOnPlayer(int sockfd, char* message);
+int parseShutdown(int sockfd);
 
 //Parse Potato
 int parsePotato(int sockfd, char* message);

@@ -58,6 +58,8 @@ int main (int argc, char *argv[])
     pthread_join(leftThreadId, NULL);
     pthread_join(rightThreadId, NULL);
     pthread_join(masterThreadId, NULL);
+
+    log_dbg("end");
 }
 
 int registerEventHandlers()
@@ -68,6 +70,7 @@ int registerEventHandlers()
     registerRightInfoReceivedOnPlayerCallback(rightInfoReceivedHandler);
     registerPotatoReceivedCallback(potatoReceivedHandler);
     registerPlayerIDReceivedOnPlayerCallback(playerIDReceivedHandler);
+    registerShutdownReceivedOnPlayerCallback(shutdownReceivedHandler);
 }
 
 int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
@@ -184,13 +187,14 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
         hopsLeft--;
         createPotatoMessage(hopsLeft, path, message);
         int r = rand() % 2;
-        if(r == 1)
+        //FIXME: This is for test purposes only
+        /*if(r == 1)
         {
             fprintf(stdout, "Sending potato to %d", leftInfo.playerID);
             log_inf("Sending potato to %d sockfd: %d", leftInfo.playerID, leftInfo.socketFD);
             sendMessageOnSocket(leftInfo.socketFD, message);
         }
-        else 
+        else */
         {
             fprintf(stdout, "Sending potato to %d", rightInfo.playerID);
             log_inf("Sending potato to %d sockfd: %d", rightInfo.playerID, rightInfo.socketFD);
@@ -219,6 +223,12 @@ int playerIDReceivedHandler(int sockfd, int selfID, int leftID, int rightID)
     rightInfo.playerID = rightID;
 
     log_dbg("end");
+}
+
+int shutdownReceivedHandler(int sockfd)
+{
+    log_dbg("shutting down");
+    shutdownSockets();
 }
 
 int shutdownSockets()

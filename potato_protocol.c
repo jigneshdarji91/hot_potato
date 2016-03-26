@@ -26,12 +26,14 @@
 typedef int (* leftPortReceivedCallback)(int sockfd, int port);
 typedef int (* playerIDReceivedCallback)(int sockfd, int selfID, int leftID, int rightID);
 typedef int (* rightACKReceivedCallback)(int sockfd);
+typedef int (* shutdownMessageReceivedCallback)(int sockfd);
 typedef int (* rightInfoReceivedCallback)(int sockfd, char* host, int portno);
 typedef int (* potatoReceivedCallback)(int sockfd, int hopsLeft, char* path);
 
 leftPortReceivedCallback leftPortReceived = NULL;
 playerIDReceivedCallback playerIDReceived = NULL;
 rightACKReceivedCallback rightACKReceived = NULL;
+shutdownMessageReceivedCallback shutdownMessageReceived = NULL;
 rightInfoReceivedCallback rightInfoReceived = NULL; 
 potatoReceivedCallback potatoReceived = NULL;
 
@@ -48,6 +50,11 @@ int registerLeftPortReceivedOnMasterCallback(void *cb)
 int registerRightACKReceivedOnMasterCallback(void *cb)
 {
     rightACKReceived = (rightACKReceivedCallback) cb;
+}
+
+int registerShutdownReceivedOnPlayerCallback(void *cb)
+{
+    shutdownMessageReceived = (shutdownMessageReceivedCallback) cb;
 }
 
 int registerPlayerIDReceivedOnPlayerCallback(void *cb)
@@ -103,6 +110,12 @@ int createPlayerIDMessage(int playerID, int leftNeighborID, int rightNeighborID,
     log_dbg("end");
 }
 
+int createShutdownMessage(char* message)
+{
+    strcpy(message, "MESSAGE_TYPE:SHUTDOWN;\0");
+
+    log_dbg("messsage: %s", message);
+}
 int createLeftSocketPortMessage(int port, char* message)
 {
     log_dbg("begin");
@@ -183,6 +196,10 @@ int parseMessage(int sockfd, char* message)
         {
             parsePotato(sockfd, message);
         }
+        if(!strcmp(messageType, "SHUTDOWN"))
+        {
+            parseShutdownMessage(sockfd, message);
+        }
     }
 
     log_dbg("end");
@@ -259,6 +276,13 @@ int parseMessageLeftPortOnMaster(int sockfd, char* message)
     }
 
     log_dbg("end");
+}
+
+int parseShutdownMessage(int sockfd, char* message)
+{
+    log_dbg("");
+    if(shutdownMessageReceived != NULL)
+        shutdownMessageReceived(sockfd);
 }
 
 int parseMessageRightConnectedOnMaster(int sockfd, char* message)
