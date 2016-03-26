@@ -23,5 +23,23 @@
 
 int createLeftSocketPortMessage(int port, char* message);
 
+//Parse Control Messages
+int parseMessage(int sockfd, char* message);
+int parseMessageLeftPortOnMaster(int sockfd, char* message);
+int parseMessageRightConnectedOnMaster(int sockfd, char* message);
+int parseMessagePlayerIDOnPlayer(int sockfd, char* message);
+int parseMessageRightInfoOnPlayer(int sockfd, char* message);
+
+//Parse Potato
+int parsePotatoOnPlayer(int sockfd, char* message);
+int parsePotatoOnMaster(int sockfd, char* message);
+
+
+//Callbacks
+
+int registerLeftPortReceivedOnMasterCallback(void *cb);
+int registerRightACKReceivedOnMasterCallback(void *cb);
+int registerPlayerIDReceivedOnPlayerCallback(void *cb);
+int registerRightInfoReceivedOnPlayerCallback(void *cb);
 
 #endif

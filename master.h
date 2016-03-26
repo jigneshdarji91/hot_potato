@@ -24,7 +24,8 @@
 #include "debug.h"
 
 int playerConnectedEventHandler(int sockfd, struct sockaddr_in *playerSock);
-int registerPlayerConnectedEventHandler();
+int leftPortReceivedHandler(int sockfd, int port);
+int registerEventHandlers();
 int allPlayersConnectedEvent();
 
 #endif /* __MASTER_H__ */

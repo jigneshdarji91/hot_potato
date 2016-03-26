@@ -31,6 +31,7 @@
 
 int noOfPlayersInRing;
 int noOfPlayersConnected;
+int noOfLeftPortsRegistered;
 int masterPort;
 int noOfHops;
 
@@ -49,18 +50,42 @@ int main (int argc, char *argv[])
     masterPort = atoi(argv[1]);
     noOfPlayersInRing = atoi(argv[2]);
     noOfPlayersConnected = 0;
+    noOfLeftPortsRegistered = 0;
     noOfHops = atoi(argv[3]);
 
-    registerPlayerConnectedEventHandler();
+    registerEventHandlers();
 
     log_inf("master: port=%d players=%d hops=%d", masterPort, noOfPlayersInRing, noOfHops);
     pthread_t threadId = makeMultiClientServer(masterPort);
     pthread_join(threadId, NULL);
 }
 
-int registerPlayerConnectedEventHandler()
+int registerEventHandlers()
 {
     registerClientConnectedCallback(playerConnectedEventHandler);
+    registerLeftPortReceivedOnMasterCallback(leftPortReceivedHandler);
+}
+
+int leftPortReceivedHandler(int sockfd, int port)
+{
+    log_dbg("begin sockfd: %d port: %d htons(port): %d", sockfd, port, htons(port));
+    int i = 0;
+    for(; i < noOfPlayersConnected; ++i)
+    {
+        if(playerList[i].socketFD == sockfd)
+        {
+            playerList[i].leftSockInfo.sin_family = AF_INET;
+            playerList[i].leftSockInfo.sin_port = htons(port);
+            playerList[i].leftSockInfo.sin_addr.s_addr = playerList[i].northSockInfo.sin_addr.s_addr;
+            break;
+        }
+    }
+    noOfLeftPortsRegistered++;
+    if(noOfLeftPortsRegistered == noOfPlayersInRing)
+    {
+        allPlayersConnectedEvent();
+    }
+    log_dbg("end");
 }
 
 int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
@@ -75,16 +100,21 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
     playerList[noOfPlayersConnected].northSockInfo = *playerSock;
 
     noOfPlayersConnected++;
-    if(noOfPlayersConnected == noOfPlayersInRing)
-    {
-        allPlayersConnectedEvent();
-    }
     log_dbg("end noOfPlayersConnected: %d", noOfPlayersConnected);
 }
 
 int allPlayersConnectedEvent()
 {
     log_dbg("begin");
+    int i = 0;
+    for(; i < noOfPlayersConnected; ++i)
+    {
+        log_inf("ID: %d host: %s port: %d", 
+            playerList[i].playerID, 
+            inet_ntoa(playerList[i].leftSockInfo.sin_addr),
+            ntohs(playerList[i].leftSockInfo.sin_port));
+    }
+
     log_dbg("end");
 }
 
