@@ -26,6 +26,7 @@
 //Event Handler
 int registerEventHandlers();
 int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSockAddr);
+int leftNeighborConnectedEventHandler(int sockfd, struct sockaddr_in* leftSock);
 int masterConnectedEventHandler(int sockfd, struct sockaddr* masterSock);
 int rightInfoReceivedHandler(int sockfd, char* host, int port);
 int potatoReceivedHandler(int sockfd, int hopsLeft, char* path);
@@ -35,6 +36,6 @@ int sendLeftPortToMaster(int sockfd);
 int sendRightACKToMaster(int sockfd);
 
 //Misc
-int shutdownSocktes();
+int shutdownSockets();
 
 #endif

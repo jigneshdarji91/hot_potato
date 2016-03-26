@@ -19,7 +19,7 @@
 #include "socketlib.h"
 #include "potato_protocol.h"
 
-#define MAXMSG  512
+#define MAXMSG  9616
 
 typedef int (* clientConnectedCallback)(int sockfd, struct sockaddr_in* clientSock);
 typedef int (* serverConnectedCallback)(int sockfd, struct sockaddr* serverSock);
@@ -73,6 +73,7 @@ int readMessageOnSocket(int filedes)
     else
     {
         /*  Data read. */
+        buffer[nbytes] = 0;
         fprintf (stderr, "Server: got message: `%s'\n", buffer);
         parseMessage(filedes, buffer);
         retVal = 0;

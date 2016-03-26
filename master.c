@@ -203,8 +203,8 @@ int sendIDToPlayer(int playerID)
     int rightNeighbor = (playerID + 1) % noOfPlayersInRing;
     int leftNeighbor = (playerID == 0)?(noOfPlayersInRing - 1):(playerID - 1);
     createPlayerIDMessage(playerID,
-            playerList[leftNeighbor].playerID,
-            playerList[rightNeighbor].playerID,
+            rightNeighbor,
+            leftNeighbor,
             message);
     sendMessageOnSocket(playerList[playerID].socketFD, message);
 

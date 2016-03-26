@@ -44,5 +44,8 @@ int registerLeftPortReceivedOnMasterCallback(void *cb);
 int registerRightACKReceivedOnMasterCallback(void *cb);
 int registerPlayerIDReceivedOnPlayerCallback(void *cb);
 int registerRightInfoReceivedOnPlayerCallback(void *cb);
+int registerServerConnectedCallback(void *cb);
+int registerServerStartedCallback(void *cb);
+int registerPotatoReceivedCallback(void *cb);
 
 #endif
