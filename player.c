@@ -228,6 +228,7 @@ int playerIDReceivedHandler(int sockfd, int selfID, int leftID, int rightID)
 int shutdownReceivedHandler(int sockfd)
 {
     log_dbg("shutting down");
+    shutdownListenerThreads();
     shutdownSockets();
 }
 
@@ -241,3 +242,12 @@ int shutdownSockets()
 
     log_dbg("end");
 }
+
+int shutdownListenerThreads()
+{
+    log_dbg("stop all threads");
+    pthread_cancel(leftThreadId);
+    pthread_cancel(rightThreadId);
+    pthread_cancel(masterThreadId);
+}
+

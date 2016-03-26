@@ -49,5 +49,6 @@ int registerRightInfoReceivedOnPlayerCallback(void *cb);
 int registerServerConnectedCallback(void *cb);
 int registerServerStartedCallback(void *cb);
 int registerPotatoReceivedCallback(void *cb);
+int registerShutdownReceivedOnPlayerCallback(void *cb);
 
 #endif
