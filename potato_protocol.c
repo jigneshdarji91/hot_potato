@@ -24,7 +24,7 @@
 #define MAX_MSG_LEN 9616
 
 typedef int (* leftPortReceivedCallback)(int sockfd, int port);
-typedef int (* playerIDReceivedCallback)(int sockfd, int port);
+typedef int (* playerIDReceivedCallback)(int sockfd, int selfID, int leftID, int rightID);
 typedef int (* rightACKReceivedCallback)(int sockfd);
 typedef int (* rightInfoReceivedCallback)(int sockfd, char* host, int portno);
 typedef int (* potatoReceivedCallback)(int sockfd, int hopsLeft, char* path);
@@ -66,7 +66,9 @@ int createPotatoMessage(int noOfHops, char* path, char* message)
     
     strcpy(message, "MESSAGE_TYPE:POTATO;");
     
-    strcat(message, "PATH:;");
+    strcat(message, "PATH:");
+    strcat(message, path);
+    strcat(message, ";");
 
     char hopString[32];
     sprintf(hopString, "%d", noOfHops);
@@ -77,6 +79,30 @@ int createPotatoMessage(int noOfHops, char* path, char* message)
     log_dbg("end messsage: %s", message);
 }
 
+int createPlayerIDMessage(int playerID, int leftNeighborID, int rightNeighborID, char* message)
+{
+    log_dbg("begin");
+
+
+    strcpy(message, "MESSAGE_TYPE:PLAYERID;");
+
+    char pID[32], leftID[32], rightID[32];
+    sprintf(pID, "%d", playerID);
+    sprintf(leftID, "%d", leftNeighborID);
+    sprintf(rightID, "%d", rightNeighborID);
+
+    strcat(message, "YOURID:");
+    strcat(message, pID);
+    strcat(message, ";");
+    strcat(message, "LEFTID:");
+    strcat(message, leftID);
+    strcat(message, ";");
+    strcat(message, "RIGHTID:");
+    strcat(message, rightID);
+    strcat(message, ";");
+
+    log_dbg("end");
+}
 
 int createLeftSocketPortMessage(int port, char* message)
 {
@@ -156,14 +182,14 @@ int parseMessage(int sockfd, char* message)
         }
         if(!strcmp(messageType, "POTATO"))
         {
-            parsePotatoOnPlayer(sockfd, message);
+            parsePotato(sockfd, message);
         }
     }
 
     log_dbg("end");
 }
 
-int parsePotatoMessage(int sockfd, char* message)
+int parsePotato(int sockfd, char* message)
 {
     log_dbg("begin sockfd: %d received message: %s", sockfd, message);
     char messageToParseForHops[MAX_MSG_LEN];
@@ -173,14 +199,11 @@ int parsePotatoMessage(int sockfd, char* message)
     strcpy(messageToParseForHops, message);
     strcpy(messageToParseForPath, message);
 
-    log_dbg("messageToParseForHops: %s", messageToParseForHops);
-    log_dbg("messageToParseForPath: %s", messageToParseForPath);
     char *messageSplitForHops = strtok(messageToParseForHops, ";");
 
     while(messageSplitForHops != NULL)
     {
-        log_dbg("testing messageSplitForHops: %s", messageSplitForHops);
-        if(NULL != strstr(messageSplitForHops, "HOPS:"))
+        if(NULL != strstr(messageSplitForHops, "HOPCOUNT:"))
         {
             hopsLeft = strtok(messageSplitForHops, ":");
             hopsLeft = strtok(NULL, ":");
@@ -192,7 +215,6 @@ int parsePotatoMessage(int sockfd, char* message)
     char *messageSplitForPath = strtok(messageToParseForPath, ";");
     while(messageSplitForPath != NULL)
     {
-        log_dbg("testing messageSplitForPath: %s", messageSplitForPath);
         if(NULL != strstr(messageSplitForPath, "PATH:"))
         {
             path = strtok(messageSplitForPath, ":");
@@ -202,7 +224,7 @@ int parsePotatoMessage(int sockfd, char* message)
         messageSplitForPath = strtok(NULL, ";");
     } 
 
-    if(hopsLeft != NULL && path != NULL)
+    if(hopsLeft != NULL)
     {
         if(potatoReceived != NULL)
             potatoReceived(sockfd, atoi(hopsLeft), path);
@@ -248,6 +270,64 @@ int parseMessageRightConnectedOnMaster(int sockfd, char* message)
 
 int parseMessagePlayerIDOnPlayer(int sockfd, char* message)
 {
+    log_dbg("begin sockfd: %d received message: %s", sockfd, message);
+
+    char messageToParseForSelfID[MAX_MSG_LEN];
+    char messageToParseForLeftID[MAX_MSG_LEN];
+    char messageToParseForRightID[MAX_MSG_LEN];
+
+    char* selfID = "";
+    char* leftID= "";
+    char* rightID = "";
+
+    strcpy(messageToParseForSelfID, message);
+    strcpy(messageToParseForLeftID, message);
+    strcpy(messageToParseForRightID, message);
+
+    char *messageSplitForSelfID = strtok(messageToParseForSelfID, ";");
+    while(messageSplitForSelfID != NULL)
+    {
+        if(NULL != strstr(messageSplitForSelfID, "SELFID:"))
+        {
+            selfID = strtok(messageSplitForSelfID, ":");
+            selfID = strtok(NULL, ":");
+            log_inf("selfID: %s", selfID);
+        }
+        messageSplitForSelfID = strtok(NULL, ";");
+    } 
+
+    char *messageSplitForLeftID = strtok(messageToParseForSelfID, ";");
+    while(messageSplitForLeftID != NULL)
+    {
+        if(NULL != strstr(messageSplitForLeftID, "LEFTID:"))
+        {
+            leftID = strtok(messageSplitForLeftID, ":");
+            leftID = strtok(NULL, ":");
+            log_inf("leftID: %s", leftID);
+        }
+        messageSplitForLeftID = strtok(NULL, ";");
+    }
+
+    char *messageSplitForRightID = strtok(messageToParseForRightID, ";");
+    while(messageSplitForRightID != NULL)
+    {
+        if(NULL != strstr(messageSplitForRightID, "RIGHTID:"))
+        {
+            rightID = strtok(messageSplitForRightID, ":");
+            rightID = strtok(NULL, ":");
+            log_inf("rightID: %s", rightID);
+        }
+        messageSplitForRightID = strtok(NULL, ";");
+    } 
+
+
+    if(selfID != NULL && leftID != NULL && rightID != NULL)
+    {
+        if(playerIDReceived != NULL)
+            playerIDReceived(sockfd, atoi(selfID), atoi(leftID), atoi(rightID));
+    }
+
+    log_dbg("end");
 
 }
 
@@ -267,7 +347,6 @@ int parseMessageRightInfoOnPlayer(int sockfd, char* message)
 
     while(messageSplitForHost != NULL)
     {
-        log_dbg("testing messageSplitForHost: %s", messageSplitForHost);
         if(NULL != strstr(messageSplitForHost, "HOST:"))
         {
             host = strtok(messageSplitForHost, ":");
@@ -280,7 +359,6 @@ int parseMessageRightInfoOnPlayer(int sockfd, char* message)
     char *messageSplitForPort = strtok(messageToParseForPort, ";");
     while(messageSplitForPort != NULL)
     {
-        log_dbg("testing messageSplitForPort: %s", messageSplitForPort);
         if(NULL != strstr(messageSplitForPort, "PORTNO"))
         {
             portno = strtok(messageSplitForPort, ":");
@@ -297,15 +375,5 @@ int parseMessageRightInfoOnPlayer(int sockfd, char* message)
     }
 
     log_dbg("end");
-}
-
-int parsePotatoOnPlayer(int sockfd, char* message)
-{
-
-}
-
-int parsePotatoOnMaster(int sockfd, char* message)
-{
-
 }
 

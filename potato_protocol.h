@@ -22,6 +22,10 @@
 #include "debug.h"
 
 int createLeftSocketPortMessage(int port, char* message);
+int createPlayerIDMessage(int playerID, int leftNeighborID, int rightNeighborID, char* message);
+int createPotatoMessage(int noOfHops, char* path, char* message);
+int createRightNeighborInfoMessage(char* host, char* port, char* message);
+int createRighACKReceivedMessage(char* message);
 
 //Parse Control Messages
 int parseMessage(int sockfd, char* message);
@@ -31,8 +35,7 @@ int parseMessagePlayerIDOnPlayer(int sockfd, char* message);
 int parseMessageRightInfoOnPlayer(int sockfd, char* message);
 
 //Parse Potato
-int parsePotatoOnPlayer(int sockfd, char* message);
-int parsePotatoOnMaster(int sockfd, char* message);
+int parsePotato(int sockfd, char* message);
 
 
 //Callbacks

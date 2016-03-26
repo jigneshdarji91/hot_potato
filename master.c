@@ -62,6 +62,9 @@ int main (int argc, char *argv[])
 
     log_inf("master: port=%d players=%d hops=%d", masterPort, noOfPlayersInRing, noOfHops);
     pthread_t threadId = makeMultiClientServer(masterPort);
+
+    fprintf(stdout, "Potato Master on %s\n", "TODO: hostname");
+
     pthread_join(threadId, NULL);
 }
 
@@ -107,6 +110,11 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
     playerList[noOfPlayersConnected].isRightConnected = 0;
 
     noOfPlayersConnected++;
+
+    fprintf(stdout, "player %d is on %s\n", 
+            playerList[noOfPlayersConnected].playerID, 
+            inet_ntoa(playerList[noOfPlayersConnected].northSockInfo.sin_addr));
+
     log_dbg("end noOfPlayersConnected: %d", noOfPlayersConnected);
 }
 
@@ -121,11 +129,11 @@ int allPlayersConnectedEvent()
             inet_ntoa(playerList[i].leftSockInfo.sin_addr),
             ntohs(playerList[i].leftSockInfo.sin_port));
     }
-    sendRightNeighborInfoToAllPlayers();
+    sendRightNeighborInfoToAll();
     log_dbg("end");
 }
 
-int sendRightNeighborInfoToAllPlayers()
+int sendRightNeighborInfoToAll()
 {
     log_dbg("begin");
 
@@ -172,12 +180,41 @@ int ringCompleteEvent()
     log_dbg("begin");
     //LET THE GAME OF POTATO BEGIN 
     
+    sendPlayerIDsToAll();
+    sendPotato(); 
+    log_dbg("end");
+}
+
+int sendPlayerIDsToAll()
+{
+    log_dbg("begin");
+    char message[MAX_MSG_LEN];
+
+    int i = 0;
+    for(; i < noOfPlayersConnected; ++i)
+    {
+        int rightNeighbor = (i + 1) % noOfPlayersConnected;
+        int leftNeighbor = (i == 0)?(noOfPlayersConnected - 1):(i - 1);
+        createPlayerIDMessage(playerList[i].playerID,
+                playerList[leftNeighbor].playerID,
+                playerList[rightNeighbor].playerID,
+                message);
+        sendMessageOnSocket(playerList[i].socketFD, message);
+    }
+
+    log_dbg("end");
+}
+
+int sendPotato()
+{
+    log_dbg("begin");
     char message[MAX_MSG_LEN];
     int r = rand() % noOfPlayersInRing;
 
     createPotatoMessage(noOfHops, "", message);
     sendMessageOnSocket(playerList[r].socketFD, message);
+    fprintf(stdout, "All players present, sending potato to player %d", r);
+
 
     log_dbg("end");
 }
-

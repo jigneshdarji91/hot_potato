@@ -35,6 +35,8 @@ int allPlayersConnectedEvent();
 int ringCompleteEvent();
 
 // Communication
-int sendRightNeighborInfoToAllPlayers();
+int sendRightNeighborInfoToAll();
+int sendPlayerIDsToAll();
+int sendPotato();
 
 #endif /* __MASTER_H__ */

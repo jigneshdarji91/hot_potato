@@ -32,7 +32,7 @@
 
 int masterPort;
 
-PlayerInfo selfInfo, masterInfo, rightInfo;
+PlayerInfo selfInfo, masterInfo, leftInfo, rightInfo;
 int isMasterConnected= 0;
 int isLeftServerStarted = 0;
 int leftSocketFD; 
@@ -91,6 +91,9 @@ int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
 
     isLeftServerStarted = 1;
 
+    leftInfo.socketFD = sockfd;
+    leftInfo.selfSockInfo = sin;
+
     log_dbg("end");
 }
 
@@ -103,6 +106,7 @@ int masterConnectedEventHandler(int sockfd, struct sockaddr* sock)
         masterInfo.socketFD = sockfd;
         masterInfo.northSockInfo = *((struct sockaddr_in *) sock);
         sendLeftPortToMaster(sockfd);
+        isMasterConnected = 1;
     }
     else
     {
@@ -115,11 +119,11 @@ int masterConnectedEventHandler(int sockfd, struct sockaddr* sock)
 
 int sendLeftPortToMaster(int sockfd)
 {
-    log_dbg("begin leftPort: %d", ntohs(leftSocketAddr.sin_port));
+    log_dbg("begin leftPort: %d", ntohs(leftInfo.selfSockInfo.sin_port));
 
     char message[MAX_MSG_LEN];
     while(!isLeftServerStarted);
-    createLeftSocketPortMessage(ntohs(leftSocketAddr.sin_port), message);
+    createLeftSocketPortMessage(ntohs(leftInfo.selfSockInfo.sin_port), message);
     sendMessageOnSocket(sockfd, message);
 
     log_dbg("end");
@@ -127,7 +131,7 @@ int sendLeftPortToMaster(int sockfd)
 
 int sendRightACKToMaster(int sockfd)
 {
-    log_dbg("begin leftPort: %d", ntohs(leftSocketAddr.sin_port));
+    log_dbg("begin sockfd: %d", sockfd);
 
     char message[MAX_MSG_LEN];
     createRighACKReceivedMessage(message);
@@ -144,17 +148,25 @@ int rightInfoReceivedHandler(int sockfd, char* host, int port)
     log_dbg("end");
 }
 
-int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
+int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
 {
-    log_dbg("begin");
+    log_dbg("begin hopsLeft: %d", hopsLeft);
 
     char message[MAX_MSG_LEN];
-
-    //TODO: verify whether to return on 1 or 0
+    char path[MAX_MSG_LEN];
+    if(pathReceived == NULL)
+        strcpy(path, "");
+    else
+    {
+        strcpy(path, pathReceived);
+        strcat(path, ","); 
+    }
     char playerIDString[32];
     sprintf(playerIDString, "%d", selfInfo.playerID);
-
     strcat(path, playerIDString);
+    log_inf("potato path: %s", path);
+
+    //TODO: verify whether to return on 1 or 0
     if(hopsLeft)
     {
         hopsLeft--;
@@ -162,10 +174,12 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
         int r = rand() % 2;
         if(r == 1)
         {
+            fprintf(stdout, "Sending potato to %d", leftInfo.playerID);
             sendMessageOnSocket(leftSocketFD, message);
         }
         else 
         {
+            fprintf(stdout, "Sending potato to %d", rightInfo.playerID);
             sendMessageOnSocket(rightInfo.socketFD, message); 
         }
     }
@@ -174,7 +188,32 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
         fprintf(stdout, "I'm it\n");
         createPotatoMessage(hopsLeft, path, message);
         sendMessageOnSocket(masterInfo.socketFD, message); 
+        shutdownSockets();
     }
+
+    log_dbg("end");
+}
+
+int playerIDReceivedHandler(int sockfd, int selfID, int leftID, int rightID)
+{
+    log_dbg("begin");
+
+    fprintf(stdout, "Connected as player %d", selfID);
+
+    selfInfo.playerID = selfID;
+    leftInfo.playerID = leftID;
+    rightInfo.playerID = rightID;
+
+    log_dbg("end");
+}
+
+int shutdownSockets()
+{
+    log_dbg("begin");
+    
+    close(leftSocketFD);
+    close(masterInfo.socketFD);
+    close(rightInfo.socketFD);
 
     log_dbg("end");
 }
