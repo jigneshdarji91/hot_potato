@@ -28,6 +28,7 @@
 int playerConnectedEventHandler(int sockfd, struct sockaddr_in *playerSock);
 int leftPortReceivedHandler(int sockfd, int port);
 int rightACKReceivedHandler(int sockfd);
+int potatoReceivedHandler(int sockfd, int hopsLeft, char* path);
 int registerEventHandlers();
 
 // Events
@@ -38,5 +39,8 @@ int ringCompleteEvent();
 int sendRightNeighborInfoToAll();
 int sendPlayerIDsToAll();
 int sendPotato();
+
+//MISC
+int getPlayerIDFromSockFD(int sockfd);
 
 #endif /* __MASTER_H__ */

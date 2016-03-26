@@ -73,6 +73,14 @@ int registerEventHandlers()
     registerClientConnectedCallback(playerConnectedEventHandler);
     registerLeftPortReceivedOnMasterCallback(leftPortReceivedHandler);
     registerRightACKReceivedOnMasterCallback(rightACKReceivedHandler);
+    registerPotatoReceivedCallback(potatoReceivedHandler);
+}
+
+int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
+{
+    log_dbg("begin sockfd: %d hopsLeft: %d path: %s", sockfd, hopsLeft, path);
+
+    log_dbg("end");
 }
 
 int leftPortReceivedHandler(int sockfd, int port)
@@ -99,7 +107,7 @@ int leftPortReceivedHandler(int sockfd, int port)
 
 int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
 {
-    log_dbg("begin sockfd: %d", sockfd);
+    log_dbg("begin sockfd: %d player: %d", sockfd, getPlayerIDFromSockFD(sockfd));
     log_inf("Server: connect from host %s, port %hd\n",
             inet_ntoa (playerSock->sin_addr),
             ntohs (playerSock->sin_port));
@@ -218,3 +226,18 @@ int sendPotato()
 
     log_dbg("end");
 }
+
+int getPlayerIDFromSockFD(int sockfd)
+{
+    int i = 0, playerID = -1;
+    for(; i < noOfPlayersConnected; ++i)
+    {
+        if(playerList[i].socketFD == sockfd)
+        {
+            playerID = playerList[i].playerID;
+        }
+    }
+    log_dbg("sockfd: %d playerID: %d", sockfd, playerID);
+    return playerID;
+}
+

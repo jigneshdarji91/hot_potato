@@ -35,9 +35,7 @@ int masterPort;
 PlayerInfo selfInfo, masterInfo, leftInfo, rightInfo;
 int isMasterConnected= 0;
 int isLeftServerStarted = 0;
-int leftSocketFD; 
 int leftPort = 0; 
-struct sockaddr_in leftSocketAddr;
 
 pthread_t leftThreadId, rightThreadId, masterThreadId;
 //char* log_filename = "player.log";
@@ -86,8 +84,6 @@ int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
             inet_ntoa (sin.sin_addr),
             ntohs (sin.sin_port));
 
-    leftSocketFD = sockfd;
-    leftSocketAddr = sin;
 
     isLeftServerStarted = 1;
 
@@ -113,7 +109,7 @@ int masterConnectedEventHandler(int sockfd, struct sockaddr* sock)
         log_inf("right player connected");
         rightInfo.socketFD = sockfd;
         rightInfo.leftSockInfo = *((struct sockaddr_in *) sock);
-        sendRightACKToMaster(sockfd);
+        sendRightACKToMaster(masterInfo.socketFD);
     }
 }
 
@@ -175,7 +171,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
         if(r == 1)
         {
             fprintf(stdout, "Sending potato to %d", leftInfo.playerID);
-            sendMessageOnSocket(leftSocketFD, message);
+            sendMessageOnSocket(leftInfo.socketFD, message);
         }
         else 
         {
@@ -211,7 +207,7 @@ int shutdownSockets()
 {
     log_dbg("begin");
     
-    close(leftSocketFD);
+    close(leftInfo.socketFD);
     close(masterInfo.socketFD);
     close(rightInfo.socketFD);
 

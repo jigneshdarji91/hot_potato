@@ -34,4 +34,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* path);
 int sendLeftPortToMaster(int sockfd);
 int sendRightACKToMaster(int sockfd);
 
+//Misc
+int shutdownSocktes();
+
 #endif
