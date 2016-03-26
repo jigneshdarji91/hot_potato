@@ -105,10 +105,10 @@ int masterConnectedEventHandler(int sockfd, struct sockaddr* masterSock)
     masterInfo.socketFD = sockfd;
     masterInfo.northSockInfo = *((struct sockaddr_in *) masterSock);
 
-    sendMasterLeftPortInfo(sockfd);
+    sendLeftPortToMaster(sockfd);
 }
 
-int sendMasterLeftPortInfo(int sockfd)
+int sendLeftPortToMaster(int sockfd)
 {
     log_dbg("begin leftPort: %d", ntohs(leftSocketAddr.sin_port));
 

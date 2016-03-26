@@ -22,6 +22,7 @@
 #include "socketlib.h"
 #include "playerinfo.h"
 #include "debug.h"
+#include "potato_protocol.h"
 
 int playerConnectedEventHandler(int sockfd, struct sockaddr_in *playerSock);
 int leftPortReceivedHandler(int sockfd, int port);

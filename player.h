@@ -31,6 +31,6 @@ int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSockAddr);
 int masterConnectedEventHandler(int sockfd, struct sockaddr* masterSock);
 
 //Communication
-int sendMasterLeftPortInfo(int sockfd);
+int sendLeftPortToMaster(int sockfd);
 
 #endif
