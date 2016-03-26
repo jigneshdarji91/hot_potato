@@ -24,6 +24,7 @@
 typedef struct {
     int playerID;
     int socketFD;
+    int isRightConnected;
     struct sockaddr_in leftSockInfo;
     struct sockaddr_in northSockInfo;
 } PlayerInfo;

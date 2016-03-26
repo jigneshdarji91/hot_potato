@@ -25,8 +25,8 @@
 
 typedef int (* leftPortReceivedCallback)(int sockfd, int port);
 typedef int (* playerIDReceivedCallback)(int sockfd, int port);
-typedef int (* rightACKReceivedCallback)(int sockfd, int port);
-typedef int (* rightInfoReceivedCallback)(int sockfd, char* host, char* portno);
+typedef int (* rightACKReceivedCallback)(int sockfd);
+typedef int (* rightInfoReceivedCallback)(int sockfd, char* host, int portno);
 
 leftPortReceivedCallback leftPortReceived = NULL;
 playerIDReceivedCallback playerIDReceived = NULL;
@@ -63,6 +63,7 @@ int createLeftSocketPortMessage(int port, char* message)
     char portString[32];
     sprintf(portString, "%d", port);
     strcat(message, portString);
+    strcat(message, ";");
 
     log_dbg("end messsage: %s", message);
 }
@@ -78,8 +79,16 @@ int createRightNeighborInfoMessage(char* host, char* port, char* message)
     strcat(message, ";");
     strcat(message, "PORTNO:");
     strcat(message, port);
+    strcat(message, ";");
 
     log_dbg("end messsage: %s", message);
+}
+
+int createRighACKReceivedMessage(char* message)
+{
+    strcpy(message, "MESSAGE_TYPE:RIGHTCONNECTED;\0");
+
+    log_dbg("messsage: %s", message);
 }
 
 int parseMessage(int sockfd, char* message)
@@ -104,23 +113,23 @@ int parseMessage(int sockfd, char* message)
 
     if(messageType != NULL)
     {
-        if(!strcmp(messageType, "LEFTPORT"))
+        if(!strstr(messageType, "LEFTPORT"))
         {
             parseMessageLeftPortOnMaster(sockfd, message);
         }
-        if(!strcmp(messageType, "RIGHTCONNECTED"))
+        if(!strstr(messageType, "RIGHTCONNECTED"))
         {
             parseMessageRightConnectedOnMaster(sockfd, message);
         }
-        if(!strcmp(messageType, "PLAYERID"))
+        if(!strstr(messageType, "PLAYERID"))
         {
             parseMessagePlayerIDOnPlayer(sockfd, message);
         }
-        if(!strcmp(messageType, "RIGHTINFO"))
+        if(!strstr(messageType, "RIGHTINFO"))
         {
             parseMessageRightInfoOnPlayer(sockfd, message);
         }
-        if(!strcmp(messageType, "POTATO"))
+        if(!strstr(messageType, "POTATO"))
         {
             parsePotatoOnPlayer(sockfd, message);
         }
@@ -160,42 +169,58 @@ int parseMessageLeftPortOnMaster(int sockfd, char* message)
 
 int parseMessageRightConnectedOnMaster(int sockfd, char* message)
 {
-
+    log_dbg("");
+    rightACKReceived(sockfd);
 }
+
 int parseMessagePlayerIDOnPlayer(int sockfd, char* message)
 {
 
 }
+
 int parseMessageRightInfoOnPlayer(int sockfd, char* message)
 {
     log_inf("begin sockfd: %d received message: %s", sockfd, message);
-    char messageToParse[MAX_MSG_LEN];
+    char messageToParseForHost[MAX_MSG_LEN];
+    char messageToParseForPort[MAX_MSG_LEN];
     char* host = "";
     char* portno = "";
-    strcpy(messageToParse, message);
+    strcpy(messageToParseForHost, message);
+    strcpy(messageToParseForPort, message);
 
-    char *messageSplit = strtok(messageToParse, ";");
-    while(messageSplit != NULL)
+    log_dbg("messageToParseForHost: %s", messageToParseForHost);
+    log_dbg("messageToParseForPort: %s", messageToParseForPort);
+    char *messageSplitForHost = strtok(messageToParseForHost, ";");
+
+    while(messageSplitForHost != NULL)
     {
-        if(NULL != strstr(messageSplit, "HOST:"))
+        log_dbg("testing messageSplitForHost: %s", messageSplitForHost);
+        if(NULL != strstr(messageSplitForHost, "HOST:"))
         {
-            host = strtok(messageSplit, ":");
+            host = strtok(messageSplitForHost, ":");
             host = strtok(NULL, ":");
-            log_inf("section: %s host: %s", messageSplit, host);
+            log_inf("section: %s host: %s", messageSplitForHost, host);
         }
-        if(NULL != strstr(messageSplit, "PORTNO:"))
+        messageSplitForHost = strtok(NULL, ";");
+    } 
+
+    char *messageSplitForPort = strtok(messageToParseForPort, ";");
+    while(messageSplitForPort != NULL)
+    {
+        log_dbg("testing messageSplitForPort: %s", messageSplitForPort);
+        if(NULL != strstr(messageSplitForPort, "PORTNO"))
         {
-            portno = strtok(messageSplit, ":");
+            portno = strtok(messageSplitForPort, ":");
             portno = strtok(NULL, ":");
-            log_inf("section: %s portno: %s", messageSplit, portno);
+            log_inf("section: %s portno: %s", messageSplitForPort, portno);
         }
-        messageSplit = strtok(NULL, ";");
+        messageSplitForPort = strtok(NULL, ";");
     } 
 
     if(host != NULL && portno != NULL)
     {
         if(rightInfoReceived!= NULL)
-            rightInfoReceived(sockfd, host, portno);
+            rightInfoReceived(sockfd, host, atoi(portno));
     }
 
     log_dbg("end");

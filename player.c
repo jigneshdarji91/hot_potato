@@ -32,12 +32,14 @@
 
 int masterPort;
 
-PlayerInfo selfInfo, masterInfo;
+PlayerInfo selfInfo, masterInfo, rightInfo;
+int isMasterConnected= 0;
 int isLeftServerStarted = 0;
 int leftSocketFD; 
 int leftPort = 0; 
 struct sockaddr_in leftSocketAddr;
 
+pthread_t leftThreadId, rightThreadId, masterThreadId;
 //char* log_filename = "player.log";
 
 int main (int argc, char *argv[])
@@ -52,11 +54,12 @@ int main (int argc, char *argv[])
 
     masterPort = atoi(argv[2]);
     log_inf("player: master=%s port=%d", argv[1], masterPort);
-    pthread_t leftThreadId = makeSingleClientServer(leftPort);
-    pthread_t masterThreadId = makeClient(argv[1], masterPort);
+    leftThreadId = makeSingleClientServer(leftPort);
+    masterThreadId = makeClient(argv[1], masterPort);
 
-    pthread_join(masterThreadId, NULL);
     pthread_join(leftThreadId, NULL);
+    pthread_join(rightThreadId, NULL);
+    pthread_join(masterThreadId, NULL);
 }
 
 int registerEventHandlers()
@@ -90,14 +93,23 @@ int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
     log_dbg("end");
 }
 
-int masterConnectedEventHandler(int sockfd, struct sockaddr* masterSock)
+int masterConnectedEventHandler(int sockfd, struct sockaddr* sock)
 {
     log_dbg("begin sockfd: %d", sockfd);
-
-    masterInfo.socketFD = sockfd;
-    masterInfo.northSockInfo = *((struct sockaddr_in *) masterSock);
-
-    sendLeftPortToMaster(sockfd);
+    if(!isMasterConnected)
+    {
+        log_inf("master connected");
+        masterInfo.socketFD = sockfd;
+        masterInfo.northSockInfo = *((struct sockaddr_in *) sock);
+        sendLeftPortToMaster(sockfd);
+    }
+    else
+    {
+        log_inf("right player connected");
+        rightInfo.socketFD = sockfd;
+        rightInfo.leftSockInfo = *((struct sockaddr_in *) sock);
+        sendRightACKToMaster(sockfd);
+    }
 }
 
 int sendLeftPortToMaster(int sockfd)
@@ -112,7 +124,22 @@ int sendLeftPortToMaster(int sockfd)
     log_dbg("end");
 }
 
-int rightInfoReceivedHandler(int sockfd, char* host, char* port)
+int sendRightACKToMaster(int sockfd)
 {
-    log_dbg("begin sockfd: %d host: %s port: %s", sockfd, host, port);
+    log_dbg("begin leftPort: %d", ntohs(leftSocketAddr.sin_port));
+
+    char message[MAX_MSG_LEN];
+    createRighACKReceivedMessage(message);
+    sendMessageOnSocket(sockfd, message);
+
+    log_dbg("end");
 }
+
+int rightInfoReceivedHandler(int sockfd, char* host, int port)
+{
+    log_dbg("begin sockfd: %d host: %s port: %d", sockfd, host, port);
+    rightThreadId = makeClient(host, port);
+    sendRightACKToMaster(sockfd);
+    log_dbg("end");
+}
+

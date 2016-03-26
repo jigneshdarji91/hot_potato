@@ -34,6 +34,7 @@
 int noOfPlayersInRing;
 int noOfPlayersConnected;
 int noOfLeftPortsRegistered;
+int noOfPlayersComplete;
 int masterPort;
 int noOfHops;
 
@@ -49,10 +50,12 @@ int main (int argc, char *argv[])
         exit(1);
     }
 
-    masterPort = atoi(argv[1]);
     noOfPlayersInRing = atoi(argv[2]);
     noOfPlayersConnected = 0;
     noOfLeftPortsRegistered = 0;
+    noOfPlayersComplete = 0;
+
+    masterPort = atoi(argv[1]);
     noOfHops = atoi(argv[3]);
 
     registerEventHandlers();
@@ -66,6 +69,7 @@ int registerEventHandlers()
 {
     registerClientConnectedCallback(playerConnectedEventHandler);
     registerLeftPortReceivedOnMasterCallback(leftPortReceivedHandler);
+    registerRightACKReceivedOnMasterCallback(rightACKReceivedHandler);
 }
 
 int leftPortReceivedHandler(int sockfd, int port)
@@ -100,6 +104,7 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
     playerList[noOfPlayersConnected].playerID = noOfPlayersConnected;
     playerList[noOfPlayersConnected].socketFD = sockfd;
     playerList[noOfPlayersConnected].northSockInfo = *playerSock;
+    playerList[noOfPlayersConnected].isRightConnected = 0;
 
     noOfPlayersConnected++;
     log_dbg("end noOfPlayersConnected: %d", noOfPlayersConnected);
@@ -136,6 +141,35 @@ int sendRightNeighborInfoToAllPlayers()
         sendMessageOnSocket(playerList[i].socketFD, message);
     }
 
+    log_dbg("end");
+}
+
+int rightACKReceivedHandler(int sockfd)
+{
+    log_dbg("begin sockfd: %d ", sockfd);
+    int i = 0;
+    for(; i < noOfPlayersConnected; ++i)
+    {
+        if(playerList[i].socketFD == sockfd)
+        {
+            if(playerList[i].isRightConnected == 0)
+                playerList[i].isRightConnected = 1;
+            else
+                log_err("ERROR: Right ACK already received");
+        }
+    }
+
+    noOfPlayersComplete++;
+    if(noOfPlayersComplete == noOfPlayersInRing)
+    {
+        ringCompleteEvent();
+    }
+    log_dbg("end");
+}
+
+int ringCompleteEvent()
+{
+    log_dbg("begin");
     log_dbg("end");
 }
 

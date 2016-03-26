@@ -24,10 +24,17 @@
 #include "debug.h"
 #include "potato_protocol.h"
 
+// Handlers
 int playerConnectedEventHandler(int sockfd, struct sockaddr_in *playerSock);
 int leftPortReceivedHandler(int sockfd, int port);
+int rightACKReceivedHandler(int sockfd);
 int registerEventHandlers();
+
+// Events
 int allPlayersConnectedEvent();
+int ringCompleteEvent();
+
+// Communication
 int sendRightNeighborInfoToAllPlayers();
 
 #endif /* __MASTER_H__ */
