@@ -80,6 +80,7 @@ int registerEventHandlers()
 
 int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
 {
+    //NOTE: sockfd 0 would imply that the noOfHops were 0 on input and the potato never entered the network
     log_dbg("begin sockfd: %d hopsLeft: %d path: %s", sockfd, hopsLeft, path);
     
     fprintf(stdout, "Trace of potato:\n%s\n", path);
@@ -268,10 +269,14 @@ int sendPotato()
     char message[MAX_MSG_LEN];
     int r = rand() % noOfPlayersInRing;
 
-    createPotatoMessage(noOfHops, "", message);
-    sendMessageOnSocket(playerList[r].socketFD, message);
-    fprintf(stdout, "All players present, sending potato to player %d\n", r);
-
+    if(noOfHops > 0)
+    {
+        createPotatoMessage(noOfHops, "", message);
+        sendMessageOnSocket(playerList[r].socketFD, message);
+        fprintf(stdout, "All players present, sending potato to player %d\n", r);
+    }
+    
+    potatoReceivedHandler(0, noOfHops, "");
 
     log_dbg("end");
 }
