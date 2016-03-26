@@ -111,18 +111,20 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
     log_inf("Server: connect from host %s, port %hd\n",
             inet_ntoa (playerSock->sin_addr),
             ntohs (playerSock->sin_port));
-
-    playerList[noOfPlayersConnected].playerID = noOfPlayersConnected;
-    playerList[noOfPlayersConnected].socketFD = sockfd;
-    playerList[noOfPlayersConnected].northSockInfo = *playerSock;
-    playerList[noOfPlayersConnected].isRightConnected = 0;
+    
+    int playerID = noOfPlayersConnected;
+    playerList[playerID].playerID = playerID;
+    playerList[playerID].socketFD = sockfd;
+    playerList[playerID].northSockInfo = *playerSock;
+    playerList[playerID].isRightConnected = 0;
 
     noOfPlayersConnected++;
 
     fprintf(stdout, "player %d is on %s\n", 
-            playerList[noOfPlayersConnected].playerID, 
-            inet_ntoa(playerList[noOfPlayersConnected].northSockInfo.sin_addr));
+            playerList[playerID].playerID, 
+            inet_ntoa(playerList[playerID].northSockInfo.sin_addr));
 
+    sendIDToPlayer(playerID);
     log_dbg("end noOfPlayersConnected: %d", noOfPlayersConnected);
 }
 
@@ -188,8 +190,24 @@ int ringCompleteEvent()
     log_dbg("begin");
     //LET THE GAME OF POTATO BEGIN 
     
-    sendPlayerIDsToAll();
+    // sendPlayerIDsToAll();
     sendPotato(); 
+    log_dbg("end");
+}
+
+int sendIDToPlayer(int playerID)
+{
+    log_dbg("begin playerID: %d", playerID);
+    char message[MAX_MSG_LEN];
+
+    int rightNeighbor = (playerID + 1) % noOfPlayersInRing;
+    int leftNeighbor = (playerID == 0)?(noOfPlayersInRing - 1):(playerID - 1);
+    createPlayerIDMessage(playerID,
+            playerList[leftNeighbor].playerID,
+            playerList[rightNeighbor].playerID,
+            message);
+    sendMessageOnSocket(playerList[playerID].socketFD, message);
+
     log_dbg("end");
 }
 
