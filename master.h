@@ -44,6 +44,7 @@ int sendPotato();
 //MISC
 int getPlayerIDFromSockFD(int sockfd);
 int shutdownAllPlayers();
-int shutdownAllSockets();
+int shutdownSockets();
+int shutdownListenerThreads();
 
 #endif /* __MASTER_H__ */

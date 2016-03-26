@@ -38,6 +38,7 @@ int noOfPlayersComplete;
 int masterPort;
 int noOfHops;
 
+pthread_t threadId;
 PlayerInfo playerList[MAX_PLAYERS];
 // char* log_filename = "master.log";
 
@@ -61,7 +62,7 @@ int main (int argc, char *argv[])
     registerEventHandlers();
 
     log_inf("master: port=%d players=%d hops=%d", masterPort, noOfPlayersInRing, noOfHops);
-    pthread_t threadId = makeMultiClientServer(masterPort);
+    threadId = makeMultiClientServer(masterPort);
 
     char host[64];
     gethostname(host, sizeof(host));
@@ -70,6 +71,7 @@ int main (int argc, char *argv[])
     fprintf(stdout, "Hops = %d\n", noOfHops);
 
     pthread_join(threadId, NULL);
+    log_dbg("end");
 }
 
 int registerEventHandlers()
@@ -87,7 +89,8 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
     
     fprintf(stdout, "Trace of potato:\n%s\n", path);
     shutdownAllPlayers();
-    shutdownAllSockets();
+    shutdownListenerThreads();
+    shutdownSockets();
     log_dbg("end");
 }
 
@@ -104,7 +107,7 @@ int shutdownAllPlayers()
     log_dbg("end");
 }
 
-int shutdownAllSockets()
+int shutdownSockets()
 {
     log_dbg("begin");
 
@@ -115,6 +118,12 @@ int shutdownAllSockets()
     }
 
     log_dbg("end");
+}
+
+int shutdownListenerThreads()
+{
+    log_dbg("stopping server thread");
+    pthread_cancel(threadId);
 }
 
 int leftPortReceivedHandler(int sockfd, int port)
@@ -302,4 +311,3 @@ int getPlayerIDFromSockFD(int sockfd)
     log_dbg("sockfd: %d playerID: %d", sockfd, playerID);
     return playerID;
 }
-
