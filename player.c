@@ -183,11 +183,11 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
     log_inf("potato path: %s", path);
 
     //TODO: verify whether to return on 1 or 0
-    if(hopsLeft > 0)
+    if(hopsLeft > 1)
     {
         hopsLeft--;
         createPotatoMessage(hopsLeft, path, message);
-        srand(selfInfo.playerID);
+        srand(time(NULL));
         int r = rand() % 2;
         int playerID = -1;
         int socketFD = -1;
@@ -213,8 +213,6 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
         fprintf(stdout, "I'm it\n");
         createPotatoMessage(hopsLeft, path, message);
         sendMessageOnSocket(masterInfo.socketFD, message); 
-        shutdownListenerThreads();
-        shutdownSockets();
     }
 
     log_dbg("end");
