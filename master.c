@@ -282,6 +282,7 @@ int sendPotato()
 {
     log_dbg("begin");
     char message[MAX_MSG_LEN];
+    srand(time(NULL));
     int r = rand() % noOfPlayersInRing;
 
     if(noOfHops > 0)

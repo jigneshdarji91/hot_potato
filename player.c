@@ -187,6 +187,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
     {
         hopsLeft--;
         createPotatoMessage(hopsLeft, path, message);
+        srand(selfInfo.playerID);
         int r = rand() % 2;
         int playerID = -1;
         int socketFD = -1;
