@@ -113,23 +113,23 @@ int parseMessage(int sockfd, char* message)
 
     if(messageType != NULL)
     {
-        if(!strstr(messageType, "LEFTPORT"))
+        if(!strcmp(messageType, "LEFTPORT"))
         {
             parseMessageLeftPortOnMaster(sockfd, message);
         }
-        if(!strstr(messageType, "RIGHTCONNECTED"))
+        if(!strcmp(messageType, "RIGHTCONNECTED"))
         {
             parseMessageRightConnectedOnMaster(sockfd, message);
         }
-        if(!strstr(messageType, "PLAYERID"))
+        if(!strcmp(messageType, "PLAYERID"))
         {
             parseMessagePlayerIDOnPlayer(sockfd, message);
         }
-        if(!strstr(messageType, "RIGHTINFO"))
+        if(!strcmp(messageType, "RIGHTINFO"))
         {
             parseMessageRightInfoOnPlayer(sockfd, message);
         }
-        if(!strstr(messageType, "POTATO"))
+        if(!strcmp(messageType, "POTATO"))
         {
             parsePotatoOnPlayer(sockfd, message);
         }
