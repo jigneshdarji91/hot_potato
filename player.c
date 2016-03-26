@@ -67,6 +67,7 @@ int registerEventHandlers()
     registerServerConnectedCallback(masterConnectedEventHandler);
     registerServerStartedCallback(serverStartedEventHandler);
     registerRightInfoReceivedOnPlayerCallback(rightInfoReceivedHandler);
+    registerPotatoReceivedCallback(potatoReceivedHandler);
 }
 
 int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
@@ -143,3 +144,37 @@ int rightInfoReceivedHandler(int sockfd, char* host, int port)
     log_dbg("end");
 }
 
+int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
+{
+    log_dbg("begin");
+
+    char message[MAX_MSG_LEN];
+
+    //TODO: verify whether to return on 1 or 0
+    char playerIDString[32];
+    sprintf(playerIDString, "%d", selfInfo.playerID);
+
+    strcat(path, playerIDString);
+    if(hopsLeft)
+    {
+        hopsLeft--;
+        createPotatoMessage(hopsLeft, path, message);
+        int r = rand() % 2;
+        if(r == 1)
+        {
+            sendMessageOnSocket(leftSocketFD, message);
+        }
+        else 
+        {
+            sendMessageOnSocket(rightInfo.socketFD, message); 
+        }
+    }
+    else
+    {
+        fprintf(stdout, "I'm it\n");
+        createPotatoMessage(hopsLeft, path, message);
+        sendMessageOnSocket(masterInfo.socketFD, message); 
+    }
+
+    log_dbg("end");
+}

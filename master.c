@@ -175,7 +175,7 @@ int ringCompleteEvent()
     char message[MAX_MSG_LEN];
     int r = rand() % noOfPlayersInRing;
 
-    createNewPotato(noOfHops, message);
+    createPotatoMessage(noOfHops, "", message);
     sendMessageOnSocket(playerList[r].socketFD, message);
 
     log_dbg("end");

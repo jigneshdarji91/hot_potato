@@ -60,7 +60,7 @@ int registerRightInfoReceivedOnPlayerCallback(void *cb)
     rightInfoReceived = (rightInfoReceivedCallback) cb;
 }
 
-int createNewPotato(int noOfHops, char* message)
+int createPotatoMessage(int noOfHops, char* path, char* message)
 {
     log_dbg("begin");
     
@@ -76,6 +76,7 @@ int createNewPotato(int noOfHops, char* message)
 
     log_dbg("end messsage: %s", message);
 }
+
 
 int createLeftSocketPortMessage(int port, char* message)
 {
@@ -117,7 +118,7 @@ int createRighACKReceivedMessage(char* message)
 
 int parseMessage(int sockfd, char* message)
 {
-    log_inf("begin sockfd: %d received message: %s", sockfd, message);
+    log_dbg("begin sockfd: %d received message: %s", sockfd, message);
     char messageToParse[MAX_MSG_LEN];
     char* messageType = "";
     strcpy(messageToParse, message);
@@ -159,12 +160,60 @@ int parseMessage(int sockfd, char* message)
         }
     }
 
-    log_inf("end");
+    log_dbg("end");
+}
+
+int parsePotatoMessage(int sockfd, char* message)
+{
+    log_dbg("begin sockfd: %d received message: %s", sockfd, message);
+    char messageToParseForHops[MAX_MSG_LEN];
+    char messageToParseForPath[MAX_MSG_LEN];
+    char* hopsLeft = "";
+    char* path = "";
+    strcpy(messageToParseForHops, message);
+    strcpy(messageToParseForPath, message);
+
+    log_dbg("messageToParseForHops: %s", messageToParseForHops);
+    log_dbg("messageToParseForPath: %s", messageToParseForPath);
+    char *messageSplitForHops = strtok(messageToParseForHops, ";");
+
+    while(messageSplitForHops != NULL)
+    {
+        log_dbg("testing messageSplitForHops: %s", messageSplitForHops);
+        if(NULL != strstr(messageSplitForHops, "HOPS:"))
+        {
+            hopsLeft = strtok(messageSplitForHops, ":");
+            hopsLeft = strtok(NULL, ":");
+            log_inf("section: %s hops left: %s", messageSplitForHops, hopsLeft);
+        }
+        messageSplitForHops = strtok(NULL, ";");
+    } 
+
+    char *messageSplitForPath = strtok(messageToParseForPath, ";");
+    while(messageSplitForPath != NULL)
+    {
+        log_dbg("testing messageSplitForPath: %s", messageSplitForPath);
+        if(NULL != strstr(messageSplitForPath, "PATH:"))
+        {
+            path = strtok(messageSplitForPath, ":");
+            path = strtok(NULL, ":");
+            log_inf("section: %s path: %s", messageSplitForPath, path);
+        }
+        messageSplitForPath = strtok(NULL, ";");
+    } 
+
+    if(hopsLeft != NULL && path != NULL)
+    {
+        if(potatoReceived != NULL)
+            potatoReceived(sockfd, atoi(hopsLeft), path);
+    }
+
+    log_dbg("end");
 }
 
 int parseMessageLeftPortOnMaster(int sockfd, char* message)
 {
-    log_inf("begin sockfd: %d received message: %s", sockfd, message);
+    log_dbg("begin sockfd: %d received message: %s", sockfd, message);
     char messageToParse[MAX_MSG_LEN];
     char* messagePort = "";
     strcpy(messageToParse, message);
@@ -204,7 +253,7 @@ int parseMessagePlayerIDOnPlayer(int sockfd, char* message)
 
 int parseMessageRightInfoOnPlayer(int sockfd, char* message)
 {
-    log_inf("begin sockfd: %d received message: %s", sockfd, message);
+    log_dbg("begin sockfd: %d received message: %s", sockfd, message);
     char messageToParseForHost[MAX_MSG_LEN];
     char messageToParseForPort[MAX_MSG_LEN];
     char* host = "";

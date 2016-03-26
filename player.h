@@ -28,6 +28,7 @@ int registerEventHandlers();
 int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSockAddr);
 int masterConnectedEventHandler(int sockfd, struct sockaddr* masterSock);
 int rightInfoReceivedHandler(int sockfd, char* host, int port);
+int potatoReceivedHandler(int sockfd, int hopsLeft, char* path);
 
 //Communication
 int sendLeftPortToMaster(int sockfd);
