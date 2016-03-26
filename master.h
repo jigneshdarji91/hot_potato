@@ -38,6 +38,7 @@ int ringCompleteEvent();
 // Communication
 int sendRightNeighborInfoToAll();
 int sendPlayerIDsToAll();
+int sendIDToPlayer(int playerID);
 int sendPotato();
 
 //MISC

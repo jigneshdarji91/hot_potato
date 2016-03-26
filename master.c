@@ -172,7 +172,7 @@ int rightACKReceivedHandler(int sockfd)
         {
             if(playerList[i].isRightConnected == 0)
                 playerList[i].isRightConnected = 1;
-            else
+            else if(playerList[i].isRightConnected == 1)
                 log_err("ERROR: Right ACK already received");
         }
     }

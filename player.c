@@ -67,6 +67,7 @@ int registerEventHandlers()
     registerServerStartedCallback(serverStartedEventHandler);
     registerRightInfoReceivedOnPlayerCallback(rightInfoReceivedHandler);
     registerPotatoReceivedCallback(potatoReceivedHandler);
+    registerPlayerIDReceivedOnPlayerCallback(playerIDReceivedHandler);
 }
 
 int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
@@ -88,8 +89,8 @@ int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
 
     isLeftServerStarted = 1;
 
-    //leftInfo.socketFD = sockfd;
-    //leftInfo.selfSockInfo = sin;
+    leftInfo.socketFD = sockfd;
+    leftInfo.selfSockInfo = sin;
 
     log_dbg("end");
 }
@@ -161,7 +162,7 @@ int rightInfoReceivedHandler(int sockfd, char* host, int port)
 
 int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
 {
-    log_dbg("begin hopsLeft: %d", hopsLeft);
+    log_dbg("begin playerID: %d hopsLeft: %d", selfInfo.playerID, hopsLeft);
 
     char message[MAX_MSG_LEN];
     char path[MAX_MSG_LEN];
@@ -209,7 +210,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
 
 int playerIDReceivedHandler(int sockfd, int selfID, int leftID, int rightID)
 {
-    log_dbg("begin");
+    log_dbg("begin selfID: %d leftID: %d rightID: %d", selfID, leftID, rightID);
 
     fprintf(stdout, "Connected as player %d", selfID);
 

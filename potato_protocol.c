@@ -287,7 +287,7 @@ int parseMessagePlayerIDOnPlayer(int sockfd, char* message)
     char *messageSplitForSelfID = strtok(messageToParseForSelfID, ";");
     while(messageSplitForSelfID != NULL)
     {
-        if(NULL != strstr(messageSplitForSelfID, "SELFID:"))
+        if(NULL != strstr(messageSplitForSelfID, "YOURID:"))
         {
             selfID = strtok(messageSplitForSelfID, ":");
             selfID = strtok(NULL, ":");
@@ -296,7 +296,7 @@ int parseMessagePlayerIDOnPlayer(int sockfd, char* message)
         messageSplitForSelfID = strtok(NULL, ";");
     } 
 
-    char *messageSplitForLeftID = strtok(messageToParseForSelfID, ";");
+    char *messageSplitForLeftID = strtok(messageToParseForLeftID, ";");
     while(messageSplitForLeftID != NULL)
     {
         if(NULL != strstr(messageSplitForLeftID, "LEFTID:"))
