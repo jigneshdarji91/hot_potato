@@ -281,8 +281,10 @@ int sendPotato()
         sendMessageOnSocket(playerList[r].socketFD, message);
         fprintf(stdout, "All players present, sending potato to player %d\n", r);
     }
-    
-    potatoReceivedHandler(0, noOfHops, "");
+    else
+    {
+        potatoReceivedHandler(0, noOfHops, "");
+    }
 
     log_dbg("end");
 }
