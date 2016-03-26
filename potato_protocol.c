@@ -17,6 +17,7 @@
  */
 
 #include "potato_protocol.h"
+#include <stdlib.h>
 #include <string.h>
 
 //FIXME: defined in master.c
@@ -25,7 +26,7 @@
 typedef int (* leftPortReceivedCallback)(int sockfd, int port);
 typedef int (* playerIDReceivedCallback)(int sockfd, int port);
 typedef int (* rightACKReceivedCallback)(int sockfd, int port);
-typedef int (* rightInfoReceivedCallback)(int sockfd, int port);
+typedef int (* rightInfoReceivedCallback)(int sockfd, char* host, char* portno);
 
 leftPortReceivedCallback leftPortReceived = NULL;
 playerIDReceivedCallback playerIDReceived = NULL;
@@ -62,6 +63,21 @@ int createLeftSocketPortMessage(int port, char* message)
     char portString[32];
     sprintf(portString, "%d", port);
     strcat(message, portString);
+
+    log_dbg("end messsage: %s", message);
+}
+
+int createRightNeighborInfoMessage(char* host, char* port, char* message)
+{
+    log_dbg("begin");
+    
+    strcpy(message, "MESSAGE_TYPE:RIGHTINFO;");
+    //NOTE: making PORT as the field comes in the way of the parser
+    strcat(message, "HOST:");
+    strcat(message, host);
+    strcat(message, ";");
+    strcat(message, "PORTNO:");
+    strcat(message, port);
 
     log_dbg("end messsage: %s", message);
 }
@@ -152,7 +168,37 @@ int parseMessagePlayerIDOnPlayer(int sockfd, char* message)
 }
 int parseMessageRightInfoOnPlayer(int sockfd, char* message)
 {
+    log_inf("begin sockfd: %d received message: %s", sockfd, message);
+    char messageToParse[MAX_MSG_LEN];
+    char* host = "";
+    char* portno = "";
+    strcpy(messageToParse, message);
 
+    char *messageSplit = strtok(messageToParse, ";");
+    while(messageSplit != NULL)
+    {
+        if(NULL != strstr(messageSplit, "HOST:"))
+        {
+            host = strtok(messageSplit, ":");
+            host = strtok(NULL, ":");
+            log_inf("section: %s host: %s", messageSplit, host);
+        }
+        if(NULL != strstr(messageSplit, "PORTNO:"))
+        {
+            portno = strtok(messageSplit, ":");
+            portno = strtok(NULL, ":");
+            log_inf("section: %s portno: %s", messageSplit, portno);
+        }
+        messageSplit = strtok(NULL, ";");
+    } 
+
+    if(host != NULL && portno != NULL)
+    {
+        if(rightInfoReceived!= NULL)
+            rightInfoReceived(sockfd, host, portno);
+    }
+
+    log_dbg("end");
 }
 
 int parsePotatoOnPlayer(int sockfd, char* message)

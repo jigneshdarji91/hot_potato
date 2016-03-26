@@ -28,6 +28,8 @@
 #include "master.h"
 
 #define MAX_PLAYERS 100
+//FIXME: defined in all files
+#define MAX_MSG_LEN 9616
 
 int noOfPlayersInRing;
 int noOfPlayersConnected;
@@ -113,6 +115,25 @@ int allPlayersConnectedEvent()
             playerList[i].playerID, 
             inet_ntoa(playerList[i].leftSockInfo.sin_addr),
             ntohs(playerList[i].leftSockInfo.sin_port));
+    }
+    sendRightNeighborInfoToAllPlayers();
+    log_dbg("end");
+}
+
+int sendRightNeighborInfoToAllPlayers()
+{
+    log_dbg("begin");
+
+    char message[MAX_MSG_LEN];
+
+    int i = 0;
+    for(;i < noOfPlayersInRing; i++)
+    {
+        char* host = inet_ntoa(playerList[(i + 1)%noOfPlayersInRing].leftSockInfo.sin_addr);
+        char port[32];
+        sprintf(port, "%d", ntohs(playerList[(i + 1)%noOfPlayersInRing].leftSockInfo.sin_port));
+        createRightNeighborInfoMessage(host, port, message);
+        sendMessageOnSocket(playerList[i].socketFD, message);
     }
 
     log_dbg("end");

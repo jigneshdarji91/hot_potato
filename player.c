@@ -61,17 +61,9 @@ int main (int argc, char *argv[])
 
 int registerEventHandlers()
 {
-    registerMasterConnectedEventHandler();
-    registerServerStartedEventHandler();
-}
-int registerMasterConnectedEventHandler()
-{
     registerServerConnectedCallback(masterConnectedEventHandler);
-}
-
-int registerServerStartedEventHandler()
-{
     registerServerStartedCallback(serverStartedEventHandler);
+    registerRightInfoReceivedOnPlayerCallback(rightInfoReceivedHandler);
 }
 
 int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
@@ -117,5 +109,10 @@ int sendLeftPortToMaster(int sockfd)
     createLeftSocketPortMessage(ntohs(leftSocketAddr.sin_port), message);
     sendMessageOnSocket(sockfd, message);
 
-    log_dbg("end message: %s", message);
+    log_dbg("end");
+}
+
+int rightInfoReceivedHandler(int sockfd, char* host, char* port)
+{
+    log_dbg("begin sockfd: %d host: %s port: %s", sockfd, host, port);
 }

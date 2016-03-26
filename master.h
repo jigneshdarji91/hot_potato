@@ -28,5 +28,6 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in *playerSock);
 int leftPortReceivedHandler(int sockfd, int port);
 int registerEventHandlers();
 int allPlayersConnectedEvent();
+int sendRightNeighborInfoToAllPlayers();
 
 #endif /* __MASTER_H__ */

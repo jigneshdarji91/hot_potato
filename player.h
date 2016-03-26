@@ -25,10 +25,9 @@
 
 //Event Handler
 int registerEventHandlers();
-int registerMasterConnectedEventHandler();
-int registerServerStartedEventHandler();
 int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSockAddr);
 int masterConnectedEventHandler(int sockfd, struct sockaddr* masterSock);
+int rightInfoReceivedHandler(int sockfd, char* host, char* port);
 
 //Communication
 int sendLeftPortToMaster(int sockfd);
