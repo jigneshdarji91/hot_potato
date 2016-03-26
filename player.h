@@ -39,5 +39,6 @@ int sendRightACKToMaster(int sockfd);
 
 //Misc
 int shutdownSockets();
+int shutdownListenerThreads();
 
 #endif

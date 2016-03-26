@@ -64,6 +64,8 @@ int main (int argc, char *argv[])
     pthread_t threadId = makeMultiClientServer(masterPort);
 
     fprintf(stdout, "Potato Master on %s\n", gethostbyname("0.0.0.0")->h_name);
+    fprintf(stdout, "Players = %d\n", noOfPlayersInRing);
+    fprintf(stdout, "Hops = %d\n", noOfHops);
 
     pthread_join(threadId, NULL);
 }
@@ -80,7 +82,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
 {
     log_dbg("begin sockfd: %d hopsLeft: %d path: %s", sockfd, hopsLeft, path);
     
-    fprintf(stdout, "Trace of potato:\n%s", path);
+    fprintf(stdout, "Trace of potato:\n%s\n", path);
     shutdownAllPlayers();
     shutdownAllSockets();
     log_dbg("end");
@@ -151,7 +153,7 @@ int playerConnectedEventHandler(int sockfd, struct sockaddr_in* playerSock)
 
     fprintf(stdout, "player %d is on %s\n", 
             playerList[playerID].playerID, 
-            inet_ntoa(playerList[playerID].northSockInfo.sin_addr));
+            gethostbyname(inet_ntoa(playerList[playerID].northSockInfo.sin_addr))->h_name);
 
     sendIDToPlayer(playerID);
     log_dbg("end noOfPlayersConnected: %d", noOfPlayersConnected);
@@ -268,7 +270,7 @@ int sendPotato()
 
     createPotatoMessage(noOfHops, "", message);
     sendMessageOnSocket(playerList[r].socketFD, message);
-    fprintf(stdout, "All players present, sending potato to player %d", r);
+    fprintf(stdout, "All players present, sending potato to player %d\n", r);
 
 
     log_dbg("end");

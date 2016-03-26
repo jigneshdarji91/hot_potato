@@ -187,19 +187,19 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
         hopsLeft--;
         createPotatoMessage(hopsLeft, path, message);
         int r = rand() % 2;
-        //FIXME: This is for test purposes only
-        /*if(r == 1)
+        int playerID = -1;
+        if(r == 1)
         {
-            fprintf(stdout, "Sending potato to %d", leftInfo.playerID);
-            log_inf("Sending potato to %d sockfd: %d", leftInfo.playerID, leftInfo.socketFD);
+            playerID = leftInfo.playerID;
             sendMessageOnSocket(leftInfo.socketFD, message);
         }
-        else */
+        else 
         {
-            fprintf(stdout, "Sending potato to %d", rightInfo.playerID);
-            log_inf("Sending potato to %d sockfd: %d", rightInfo.playerID, rightInfo.socketFD);
+            playerID = rightInfo.playerID;
             sendMessageOnSocket(rightInfo.socketFD, message); 
         }
+        fprintf(stdout, "Sending potato to %d hopsLeft: %d\n", playerID, hopsLeft);
+        log_inf("Sending potato to %d hopsLeft: %d", playerID, hopsLeft);
     }
     else
     {
@@ -217,7 +217,7 @@ int playerIDReceivedHandler(int sockfd, int selfID, int leftID, int rightID)
 {
     log_dbg("begin selfID: %d leftID: %d rightID: %d", selfID, leftID, rightID);
 
-    fprintf(stdout, "Connected as player %d", selfID);
+    fprintf(stdout, "Connected as player %d\n", selfID);
 
     selfInfo.playerID = selfID;
     leftInfo.playerID = leftID;

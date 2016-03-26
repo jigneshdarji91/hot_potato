@@ -75,7 +75,6 @@ int readMessageOnSocket(int filedes)
     {
         /*  Data read. */
         buffer[nbytes] = 0;
-        fprintf (stderr, "Server: got message: `%s'\n", buffer);
         parseMessage(filedes, buffer);
         retVal = 0;
     }
