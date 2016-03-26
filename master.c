@@ -63,7 +63,7 @@ int main (int argc, char *argv[])
     log_inf("master: port=%d players=%d hops=%d", masterPort, noOfPlayersInRing, noOfHops);
     pthread_t threadId = makeMultiClientServer(masterPort);
 
-    fprintf(stdout, "Potato Master on %s\n", "TODO: hostname");
+    fprintf(stdout, "Potato Master on %s\n", gethostbyname("0.0.0.0")->h_name);
 
     pthread_join(threadId, NULL);
 }
