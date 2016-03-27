@@ -122,7 +122,7 @@ int createLeftSocketPortMessage(int port, char* message)
     
     strcpy(message, "MESSAGE_TYPE:LEFTPORT;");
     //NOTE: making PORT as the field comes in the way of the parser
-    strcat(message, "PORTNO:");
+    strcat(message, "LEFTPORTNO:");
     char portString[32];
     sprintf(portString, "%d", port);
     strcat(message, portString);
@@ -275,7 +275,7 @@ int parseMessageLeftPortOnMaster(int sockfd, char* message)
     char *messageSplit = strtok(messageToParse, ";");
     while(messageSplit != NULL)
     {
-        if(NULL != strstr(messageSplit, "PORTNO"))
+        if(NULL != strstr(messageSplit, "LEFTPORTNO:"))
         {
             messagePort = strtok(messageSplit, ":");
             messagePort= strtok(NULL, ":");
@@ -398,7 +398,7 @@ int parseMessageRightInfoOnPlayer(int sockfd, char* message)
     char *messageSplitForPort = strtok(messageToParseForPort, ";");
     while(messageSplitForPort != NULL)
     {
-        if(NULL != strstr(messageSplitForPort, "PORTNO"))
+        if(NULL != strstr(messageSplitForPort, "PORTNO:"))
         {
             portno = strtok(messageSplitForPort, ":");
             portno = strtok(NULL, ":");
