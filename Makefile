@@ -1,18 +1,18 @@
-#
-#
 CC=gcc
 CFLAGS=-g -pthread
+OBJ_MASTER=master.o socketlib.o potato_protocol.o
+OBJ_PLAYER=player.o socketlib.o potato_protocol.o
 
 # comment line below for Linux machines
 #LIB= -lsocket -lnsl
 
 all: master player
 
-master:	master.o socketlib.o potato_protocol.o
-	$(CC) $(CFLAGS) -o master master.c socketlib.c potato_protocol.c
+master:	$(OBJ_MASTER)
+	$(CC) $(CFLAGS) -o $@ $(OBJ_MASTER)
 
-player:	player.o socketlib.o potato_protocol.o
-	$(CC) $(CFLAGS) -o player player.c socketlib.c potato_protocol.c
+player:	$(OBJ_PLAYER)
+	$(CC) $(CFLAGS) -o $@ $(OBJ_PLAYER)
 
 
 clean:
