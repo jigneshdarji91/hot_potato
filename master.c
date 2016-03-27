@@ -219,13 +219,16 @@ int rightACKReceivedHandler(int sockfd)
         if(playerList[i].socketFD == sockfd)
         {
             if(playerList[i].isRightConnected == 0)
+            {
                 playerList[i].isRightConnected = 1;
+                noOfPlayersComplete++;
+            }
             else if(playerList[i].isRightConnected == 1)
                 log_err("ERROR: Right ACK already received");
+            break;
         }
     }
 
-    noOfPlayersComplete++;
     if(noOfPlayersComplete == noOfPlayersInRing)
     {
         ringCompleteEvent();
@@ -285,7 +288,7 @@ int sendPotato()
     char message[MAX_MSG_LEN];
     struct timeval currTime;
     gettimeofday(&currTime, NULL);
-    srand(currTime.tv_usec);
+    //srand(currTime.tv_usec);
     srand(time(NULL));
     int r = rand() % noOfPlayersInRing;
 

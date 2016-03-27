@@ -36,6 +36,8 @@ int masterPort;
 PlayerInfo selfInfo, masterInfo, leftInfo, rightInfo;
 int isMasterConnected= 0;
 int isLeftServerStarted = 0;
+int isLeftPeerConnected = 0;
+int isRightPeerConnected = 0;
 int leftPort = 0; 
 
 pthread_t leftThreadId, rightThreadId, masterThreadId;
@@ -111,6 +113,10 @@ int leftNeighborConnectedEventHandler(int sockfd, struct sockaddr_in* leftSock)
     leftInfo.socketFD = sockfd;
     leftInfo.selfSockInfo = *leftSock;
     
+    isLeftPeerConnected = 1;
+    if(isRightPeerConnected == 1)
+        sendRightACKToMaster(masterInfo.socketFD);
+
     log_dbg("end");
 }
 
@@ -130,7 +136,9 @@ int masterConnectedEventHandler(int sockfd, struct sockaddr* sock)
         log_inf("right player connected sockfd: %d", sockfd);
         rightInfo.socketFD = sockfd;
         rightInfo.leftSockInfo = *((struct sockaddr_in *) sock);
-        sendRightACKToMaster(masterInfo.socketFD);
+        isRightPeerConnected = 1;
+        if(isLeftPeerConnected == 1)
+            sendRightACKToMaster(masterInfo.socketFD);
     }
 }
 
@@ -190,7 +198,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
         createPotatoMessage(hopsLeft, path, message);
         struct timeval currTime;
         gettimeofday(&currTime, NULL);
-        srand(currTime.tv_usec);
+        // srand(currTime.tv_usec);
         int r = rand() % 2;
         int playerID = -1;
         int socketFD = -1;
@@ -207,7 +215,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
 
         //FIXME: remove hopsLeft from the print
         fprintf(stdout, "Sending potato to %d hopsLeft: %d\n", playerID, hopsLeft);
-        log_inf("Sending potato to %d hopsLeft: %d sockfd: %d", playerID, hopsLeft, socketFD);
+        log_inf("Sending potato to %d hopsLeft: %d sockfd: %d rand: %d", playerID, hopsLeft, socketFD, r);
 
         sendMessageOnSocket(leftInfo.socketFD, message);
     }

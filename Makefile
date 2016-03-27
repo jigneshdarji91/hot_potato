@@ -8,10 +8,10 @@ CFLAGS=-g -pthread
 
 all: master player
 
-master:	
+master:	master.o socketlib.o potato_protocol.o
 	$(CC) $(CFLAGS) -o master master.c socketlib.c potato_protocol.c
 
-player:	speak.o socketlib.o 
+player:	player.o socketlib.o potato_protocol.o
 	$(CC) $(CFLAGS) -o player player.c socketlib.c potato_protocol.c
 
 
@@ -25,4 +25,6 @@ squeaky:
 
 tar:
 	#cd ..; tar czvf socket.tar.gz socket/Makefile socket/listen.c socket/speak.c socket/README; cd socket; mv ../socket.tar.gz .
+	tar czvf potato.tar.gz debug.h Makefile master.h player.c README socketlib.h player.h potato_protocol.c master.c playerinfo.h  potato_protocol.h  socketlib.c 
+
 

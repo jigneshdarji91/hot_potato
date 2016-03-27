@@ -30,11 +30,12 @@ int createRighACKReceivedMessage(char* message);
 
 //Parse Control Messages
 int parseMessage(int sockfd, char* message);
+int parseMessageFromType(int sockfd, char* messageType, char* message);
 int parseMessageLeftPortOnMaster(int sockfd, char* message);
 int parseMessageRightConnectedOnMaster(int sockfd, char* message);
 int parseMessagePlayerIDOnPlayer(int sockfd, char* message);
 int parseMessageRightInfoOnPlayer(int sockfd, char* message);
-int parseShutdown(int sockfd);
+int parseShutdownMessage(int sockfd, char* message);
 
 //Parse Potato
 int parsePotato(int sockfd, char* message);

@@ -40,4 +40,6 @@ player
 *.log
 *.txt
 
+# Archive
+*.tar.gz
 

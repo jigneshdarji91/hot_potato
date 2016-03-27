@@ -166,14 +166,20 @@ int parseMessage(int sockfd, char* message)
     {
         if(NULL != strstr(messageSplit, "MESSAGE_TYPE"))
         {
-            messageType = strtok(messageSplit, ":");
+            char sectionToParse[MAX_MSG_LEN];
+            strcpy(sectionToParse, messageSplit);
+            messageType = strtok(sectionToParse, ":");
             messageType = strtok(NULL, ":");
             log_inf("section: %s message type: %s", messageSplit, messageType);
-            break;
+            parseMessageFromType(sockfd, messageType, message);
         }
         messageSplit = strtok(NULL, ";");
     } 
+}
 
+int parseMessageFromType(int sockfd, char* messageType, char* message)
+{
+    log_dbg("begin messageType: %s", messageType);
     if(messageType != NULL)
     {
         if(!strcmp(messageType, "LEFTPORT"))
