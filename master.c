@@ -265,7 +265,8 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
     //NOTE: sockfd 0 would imply that the noOfHops were 0 on input and the potato never entered the network
     log_dbg("begin sockfd: %d hopsLeft: %d path: %s", sockfd, hopsLeft, path);
     
-    fprintf(stdout, "Trace of potato:\n%s\n", path);
+    if(sockfd)
+        fprintf(stdout, "Trace of potato:\n%s\n", path);
     shutdownAllPlayers();
     shutdownSockets();
     shutdownListenerThreads();
