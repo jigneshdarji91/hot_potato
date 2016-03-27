@@ -39,6 +39,7 @@ int noOfPlayersComplete;
 int masterPort;
 int masterSocketFD = 3; //FIXME: get from the socketlib somehow through callback
 int noOfHops;
+int isPotatoSent = 0;
 
 pthread_t threadId;
 PlayerInfo playerList[MAX_PLAYERS];
@@ -197,7 +198,11 @@ int ringCompleteEvent()
 {
     log_dbg("begin");
     //LET THE GAME OF POTATO BEGIN 
-    sendPotato(); 
+    if(!isPotatoSent)
+    {
+        sendPotato(); 
+        isPotatoSent = 1;
+    }
     log_dbg("end");
 }
 
