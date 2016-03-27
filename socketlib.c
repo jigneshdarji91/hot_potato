@@ -53,8 +53,6 @@ int sendMessageOnSocket(int sockfd, char* nullTermString)
         perror("send");
         exit(1);
     }
-    int i = 1;
-    setsockopt( sockfd, IPPROTO_TCP, TCP_QUICKACK, (void *)&i, sizeof(i));
     log_dbg("end");
 }
 int readMessageOnSocket(int sockfd)
