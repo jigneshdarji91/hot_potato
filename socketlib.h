@@ -36,7 +36,7 @@ int readMessageOnSocket(int filedes);
 pthread_t makeSingleClientServer(int port);
 void* socketServerListener(void* sock);
 void* socketClientListener(void* sock);
-pthread_t makeMultiClientServer(/*TODO: call back*/ int port );
+pthread_t makeMultiClientServer(int port );
 void* multiClientServerPacketListener(void* sock);
 int createServerSocket(int port);
 pthread_t makeClient(char* host, int port);

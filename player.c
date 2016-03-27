@@ -192,7 +192,6 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
     strcat(path, playerIDString);
     log_inf("potato path: %s", path);
 
-    //TODO: verify whether to return on 1 or 0
     if(hopsLeft > 1)
     {
         hopsLeft--;

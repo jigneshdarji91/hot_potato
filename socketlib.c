@@ -79,10 +79,7 @@ int readMessageOnSocket(int sockfd)
         retVal = 0;
     }
 
-    //TODO: this happens on shutdown
-    /* close (i);
-       FD_CLR (i, &active_fd_set); */
-       return retVal;
+    return retVal;
 }
 
 pthread_t makeSingleClientServer(int port)
@@ -152,7 +149,7 @@ void* socketServerListener(void* sock_)
     log_dbg("end");
 }
 
-pthread_t makeMultiClientServer(/*TODO: call back*/ int port )
+pthread_t makeMultiClientServer(int port )
 {
     int *sock = malloc(sizeof(int *));
     *sock = createServerSocket(port);
@@ -211,7 +208,6 @@ void* multiClientServerPacketListener(void *sock_)
                         exit (EXIT_FAILURE);
                     }
                     FD_SET (newSock, &active_fd_set);
-                    //TODO: client connected
                     log_inf("Server: connect from host %s, port %hd\n",
                             inet_ntoa (clientname.sin_addr),
                             ntohs (clientname.sin_port));
@@ -246,7 +242,6 @@ int createServerSocket(int port)
 
     sockinfo.sin_family = AF_INET;
     sockinfo.sin_port = htons (port);
-    //TODO: can use gethostbyname call here
     sockinfo.sin_addr.s_addr = htonl (INADDR_ANY);
 
     if (bind (sock, (struct sockaddr *) &sockinfo, sizeof (sockinfo)) < 0)
