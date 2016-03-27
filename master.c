@@ -226,9 +226,6 @@ int sendPotato()
 {
     log_dbg("begin");
     char message[MAX_MSG_LEN];
-    struct timeval currTime;
-    gettimeofday(&currTime, NULL);
-    //srand(currTime.tv_usec);
     srand(time(NULL));
     int r = rand() % noOfPlayersInRing;
 
