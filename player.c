@@ -58,6 +58,8 @@ int main (int argc, char *argv[])
     leftThreadId = makeSingleClientServer(leftPort);
     masterThreadId = makeClient(argv[1], masterPort);
 
+    srand(time(NULL));
+
     pthread_join(leftThreadId, NULL);
     pthread_join(rightThreadId, NULL);
     pthread_join(masterThreadId, NULL);
@@ -195,9 +197,6 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
     {
         hopsLeft--;
         createPotatoMessage(hopsLeft, path, message);
-        struct timeval currTime;
-        gettimeofday(&currTime, NULL);
-        // srand(currTime.tv_usec);
         int r = rand() % 2;
         int playerID = -1;
         int socketFD = -1;
