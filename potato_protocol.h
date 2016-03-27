@@ -30,6 +30,7 @@ int createRighACKReceivedMessage(char* message);
 
 //Parse Control Messages
 int parseMessage(int sockfd, char* message);
+int parseMessageSection(int sockfd, char* messageSection, char* message);
 int parseMessageFromType(int sockfd, char* messageType, char* message);
 int parseMessageLeftPortOnMaster(int sockfd, char* message);
 int parseMessageRightConnectedOnMaster(int sockfd, char* message);

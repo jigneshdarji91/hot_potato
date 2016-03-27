@@ -161,20 +161,30 @@ int parseMessage(int sockfd, char* message)
     char* messageType = "";
     strcpy(messageToParse, message);
 
-    char *messageSplit = strtok(messageToParse, ";");
-    while(messageSplit != NULL)
+    char* start = messageToParse;
+    char* end;
+
+    while((end = strchr(start, ';')) != NULL)
     {
-        if(NULL != strstr(messageSplit, "MESSAGE_TYPE"))
-        {
-            char sectionToParse[MAX_MSG_LEN];
-            strcpy(sectionToParse, messageSplit);
-            messageType = strtok(sectionToParse, ":");
-            messageType = strtok(NULL, ":");
-            log_inf("section: %s message type: %s", messageSplit, messageType);
-            parseMessageFromType(sockfd, messageType, message);
-        }
-        messageSplit = strtok(NULL, ";");
-    } 
+        char messageSection[MAX_MSG_LEN];
+        strncpy(messageSection, start, end - start);
+        messageSection[end - start] = '\0';
+        parseMessageSection(sockfd, messageSection, message);
+        start = end + 1;
+    }
+}
+
+int parseMessageSection(int sockfd, char * messageSection, char* message)
+{
+    if(NULL != strstr(messageSection, "MESSAGE_TYPE"))
+    {
+        char sectionToParse[MAX_MSG_LEN];
+        strcpy(sectionToParse, messageSection);
+        messageSection = strtok(sectionToParse, ":");
+        messageSection = strtok(NULL, ":");
+        log_inf("section: %s message type: %s", sectionToParse, messageSection);
+        parseMessageFromType(sockfd, messageSection, message);
+    }
 }
 
 int parseMessageFromType(int sockfd, char* messageType, char* message)
