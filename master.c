@@ -197,8 +197,6 @@ int ringCompleteEvent()
 {
     log_dbg("begin");
     //LET THE GAME OF POTATO BEGIN 
-    
-    // sendPlayerIDsToAll();
     sendPotato(); 
     log_dbg("end");
 }
@@ -217,26 +215,6 @@ int sendIDToPlayer(int playerID)
     sendMessageOnSocket(playerList[playerID].socketFD, message);
 
     log_dbg("end playerID: %d leftID: %d rightID: %d", playerID, leftNeighbor, rightNeighbor);
-}
-
-int sendPlayerIDsToAll()
-{
-    log_dbg("begin");
-    char message[MAX_MSG_LEN];
-
-    int i = 0;
-    for(; i < noOfPlayersConnected; ++i)
-    {
-        int rightNeighbor = (i + 1) % noOfPlayersConnected;
-        int leftNeighbor = (i == 0)?(noOfPlayersConnected - 1):(i - 1);
-        createPlayerIDMessage(playerList[i].playerID,
-                playerList[leftNeighbor].playerID,
-                playerList[rightNeighbor].playerID,
-                message);
-        sendMessageOnSocket(playerList[i].socketFD, message);
-    }
-
-    log_dbg("end");
 }
 
 int sendPotato()
