@@ -170,7 +170,6 @@ int rightInfoReceivedHandler(int sockfd, char* host, int port)
 {
     log_dbg("begin sockfd: %d host: %s port: %d", sockfd, host, port);
     rightThreadId = makeClient(host, port);
-    sendRightACKToMaster(sockfd);
     log_dbg("end");
 }
 
