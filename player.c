@@ -245,8 +245,8 @@ int playerIDReceivedHandler(int sockfd, int selfID, int leftID, int rightID)
 int shutdownReceivedHandler(int sockfd)
 {
     log_dbg("shutting down");
-    shutdownListenerThreads();
     shutdownSockets();
+    shutdownListenerThreads();
 }
 
 int shutdownSockets()

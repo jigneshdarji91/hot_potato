@@ -37,6 +37,7 @@ int noOfPlayersConnected;
 int noOfLeftPortsRegistered;
 int noOfPlayersComplete;
 int masterPort;
+int masterSocketFD = 3; //FIXME: get from the socketlib somehow through callback
 int noOfHops;
 
 pthread_t threadId;
@@ -81,50 +82,6 @@ int registerEventHandlers()
     registerLeftPortReceivedOnMasterCallback(leftPortReceivedHandler);
     registerRightACKReceivedOnMasterCallback(rightACKReceivedHandler);
     registerPotatoReceivedCallback(potatoReceivedHandler);
-}
-
-int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
-{
-    //NOTE: sockfd 0 would imply that the noOfHops were 0 on input and the potato never entered the network
-    log_dbg("begin sockfd: %d hopsLeft: %d path: %s", sockfd, hopsLeft, path);
-    
-    fprintf(stdout, "Trace of potato:\n%s\n", path);
-    shutdownAllPlayers();
-    shutdownListenerThreads();
-    shutdownSockets();
-    log_dbg("end");
-}
-
-int shutdownAllPlayers()
-{
-    log_dbg("begin");
-    char message[MAX_MSG_LEN];
-    int i = 0;
-    for(; i < noOfPlayersConnected; ++i)
-    {
-        createShutdownMessage(message);
-        sendMessageOnSocket(playerList[i].socketFD, message);
-    }
-    log_dbg("end");
-}
-
-int shutdownSockets()
-{
-    log_dbg("begin");
-
-    int i = 0;
-    for(; i < noOfPlayersConnected; ++i)
-    {
-        shutdown(playerList[i].socketFD, 2);
-    }
-
-    log_dbg("end");
-}
-
-int shutdownListenerThreads()
-{
-    log_dbg("stopping server thread");
-    pthread_cancel(threadId);
 }
 
 int leftPortReceivedHandler(int sockfd, int port)
@@ -319,3 +276,50 @@ int getPlayerIDFromSockFD(int sockfd)
     log_dbg("sockfd: %d playerID: %d", sockfd, playerID);
     return playerID;
 }
+
+int potatoReceivedHandler(int sockfd, int hopsLeft, char* path)
+{
+    //NOTE: sockfd 0 would imply that the noOfHops were 0 on input and the potato never entered the network
+    log_dbg("begin sockfd: %d hopsLeft: %d path: %s", sockfd, hopsLeft, path);
+    
+    fprintf(stdout, "Trace of potato:\n%s\n", path);
+    shutdownAllPlayers();
+    shutdownSockets();
+    shutdownListenerThreads();
+    log_dbg("end");
+}
+
+int shutdownAllPlayers()
+{
+    log_dbg("begin");
+    char message[MAX_MSG_LEN];
+    int i = 0;
+    for(; i < noOfPlayersConnected; ++i)
+    {
+        createShutdownMessage(message);
+        sendMessageOnSocket(playerList[i].socketFD, message);
+    }
+    log_dbg("end");
+}
+
+int shutdownSockets()
+{
+    log_dbg("begin");
+
+    int i = 0;
+    for(; i < noOfPlayersConnected; ++i)
+    {
+        shutdown(playerList[i].socketFD, 2);
+    }
+
+    shutdown(masterPort, 2);
+
+    log_dbg("end");
+}
+
+int shutdownListenerThreads()
+{
+    log_dbg("stopping server thread");
+    pthread_cancel(threadId);
+}
+
