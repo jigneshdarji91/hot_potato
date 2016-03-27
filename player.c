@@ -79,8 +79,9 @@ int registerEventHandlers()
 int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
 {
 
-    //FIXME: the leftSock comes blank as we're using random port.
-    // Currently using getsockname as a workaround. 
+    /* NOTE: leftSock comes blank as we're using random port.
+     * Currently using getsockname as a workaround. */
+
     log_dbg("begin sockfd: %d", sockfd);
 
     struct sockaddr_in sin;
@@ -213,8 +214,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
             playerID = rightInfo.playerID;
         }
 
-        //FIXME: remove hopsLeft from the print
-        fprintf(stdout, "Sending potato to %d hopsLeft: %d\n", playerID, hopsLeft);
+        fprintf(stdout, "Sending potato to %d\n", playerID);
         log_inf("Sending potato to %d hopsLeft: %d sockfd: %d rand: %d", playerID, hopsLeft, socketFD, r);
 
         sendMessageOnSocket(leftInfo.socketFD, message);
