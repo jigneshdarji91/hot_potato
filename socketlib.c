@@ -45,23 +45,25 @@ int registerServerStartedCallback(void *cb)
     serverStarted = (serverStartedCallback) cb;
 }
 
-int sendMessageOnSocket(int filedes, char* nullTermString)
+int sendMessageOnSocket(int sockfd, char* nullTermString)
 {
-    log_dbg("begin socket: %d message: %s strlen: %zd", filedes, nullTermString, strlen(nullTermString));
-    int len = write(filedes, nullTermString, strlen(nullTermString));
+    log_dbg("begin socket: %d message: %s strlen: %zd", sockfd, nullTermString, strlen(nullTermString));
+    int len = write(sockfd, nullTermString, strlen(nullTermString));
     if ( len != strlen(nullTermString) ) {
         perror("send");
         exit(1);
     }
+    int i = 1;
+    setsockopt( sockfd, IPPROTO_TCP, TCP_QUICKACK, (void *)&i, sizeof(i));
     log_dbg("end");
 }
-int readMessageOnSocket(int filedes)
+int readMessageOnSocket(int sockfd)
 {
     char buffer[MAXMSG];
     int nbytes;
     int retVal;
 
-    nbytes = read (filedes, buffer, MAXMSG);
+    nbytes = read (sockfd, buffer, MAXMSG);
     if (nbytes < 0)
     {
         /*  Read error. */
@@ -75,7 +77,7 @@ int readMessageOnSocket(int filedes)
     {
         /*  Data read. */
         buffer[nbytes] = 0;
-        parseMessage(filedes, buffer);
+        parseMessage(sockfd, buffer);
         retVal = 0;
     }
 
@@ -311,6 +313,17 @@ int createServerSocket(int port)
     int result = setsockopt(sock,            /*  socket affected */
             IPPROTO_TCP,     /*  set option at TCP level */
             TCP_NODELAY,     /*  name of option */
+            (char *) &flag,  /*  the cast is historical
+                                 cruft */
+            sizeof(int));    /*  length of option value */
+    if (result < 0)
+    {
+        log_err("ERROR: TCP_NODELAY failed");
+    }
+
+    result = setsockopt(sock,            /*  socket affected */
+            SOL_SOCKET,     /*  set option at TCP level */
+            SO_REUSEADDR,     /*  name of option */
             (char *) &flag,  /*  the cast is historical
                                  cruft */
             sizeof(int));    /*  length of option value */

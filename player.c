@@ -27,6 +27,7 @@
 
 #include "player.h"
 #include "potato_protocol.h"
+#include <sys/time.h>
 
 #define MAX_MSG_LEN 9616
 
@@ -91,10 +92,10 @@ int serverStartedEventHandler(int sockfd, struct sockaddr_in* leftSock)
 
 
     isLeftServerStarted = 1;
-
+    /*
     leftInfo.socketFD = sockfd;
+    */
     leftInfo.selfSockInfo = sin;
-
     log_dbg("end");
 }
 
@@ -187,7 +188,9 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
     {
         hopsLeft--;
         createPotatoMessage(hopsLeft, path, message);
-        srand(time(NULL));
+        struct timeval currTime;
+        gettimeofday(&currTime, NULL);
+        srand(currTime.tv_usec);
         int r = rand() % 2;
         int playerID = -1;
         int socketFD = -1;
