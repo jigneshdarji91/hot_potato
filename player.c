@@ -216,7 +216,7 @@ int potatoReceivedHandler(int sockfd, int hopsLeft, char* pathReceived)
         fprintf(stdout, "Sending potato to %d\n", playerID);
         log_inf("Sending potato to %d hopsLeft: %d sockfd: %d rand: %d", playerID, hopsLeft, socketFD, r);
 
-        sendMessageOnSocket(leftInfo.socketFD, message);
+        sendMessageOnSocket(socketFD, message);
     }
     else
     {
